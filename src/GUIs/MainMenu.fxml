@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<GridPane fx:controller="GUIs.MainMenuController"
+        xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+
+    <Text text="Alaesia"
+          GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.columnSpan="3"/>
+
+    <VBox spacing="10" alignment="bottom_right"
+        GridPane.columnIndex="2" GridPane.rowIndex="1">
+        <Button text="Single Player"
+                onAction="#handleSinglePlayerButtonAction"/>
+        <Button text="Multiplayer"
+                onAction="#handleMultiplayerButtonAction"/>
+        <Button text="Scenario Editor"
+                onAction="#handleEditorButtonAction"/>
+        <Button text="Preferences"
+                onAction="#handlePreferencesButtonAction"/>
+        <Button text="Exit"
+                onAction="#handleExitButtonAction"/>
+    </VBox>
+
+</GridPane>

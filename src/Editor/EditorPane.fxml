@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?scenebuilder-stylesheet EditorPane.css?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.EditorController">
+    <children>
+        <MenuBar prefHeight="25.0" prefWidth="1024.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="0">
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem onAction="#handleNewMap" text="New Map" />
+                        <MenuItem onAction="#handleOpenMap" text="Open Map" />
+                        <MenuItem onAction="#handleCloseMap" text="Close Map" />
+                        <MenuItem onAction="#handleSaveMap" text="Save Map" />
+                        <MenuItem onAction="#handleSaveAs" text="Save Map As" />
+                        <MenuItem onAction="#handleExitToMain" text="Exit To Main Menu" />
+                        <MenuItem onAction="#handleExitAlaesia" text="Exit Alaesia" />
+                    </items>
+                </Menu>
+                <Menu text="Edit">
+                    <items>
+                        <MenuItem text="Copy" />
+                        <MenuItem text="Cut" />
+                        <MenuItem text="Paste" />
+                    </items>
+                </Menu>
+                <Menu text="Help">
+                    <items>
+                        <MenuItem onAction="#handleAbout" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <VBox prefHeight="768.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2147483647" />
+        <TabPane fx:id="editorTab" maxHeight="1.7976931348623157E308" prefHeight="768.0" prefWidth="824.0" tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
+        </TabPane>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints />
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+    </rowConstraints>
+</GridPane>
