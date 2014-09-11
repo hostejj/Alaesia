@@ -38,7 +38,7 @@
             <Pane prefHeight="200.0" prefWidth="200.0" />
             <ScrollPane prefHeight="376.0" prefWidth="200.0">
                <content>
-                  <GridPane>
+                  <GridPane fx:id="tileList">
                   </GridPane>
                </content>
             </ScrollPane>
