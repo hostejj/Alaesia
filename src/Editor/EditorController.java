@@ -33,7 +33,7 @@ public class EditorController {
     public void handleOpenMap(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Map to Open");
-        fileChooser.setInitialDirectory(new File("Alaesia/src/Resources/Maps"));
+        fileChooser.setInitialDirectory(new File("src/Resources/Maps"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Alaesia Map Files (.amap)", "*.amap"));
         try{
             File mapFile = fileChooser.showOpenDialog(new Stage());
@@ -94,7 +94,7 @@ public class EditorController {
             if(t.isSelected()){
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Enter a Name to Save As");
-                fileChooser.setInitialDirectory(new File("Alaesia/src/Resources/Maps"));
+                fileChooser.setInitialDirectory(new File("src/Resources/Maps"));
                 fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Alaesia Map Files (.amap)", "*.amap"));
                 try{
                     File mapFile = fileChooser.showSaveDialog(new Stage());
