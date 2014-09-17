@@ -5,8 +5,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
 /**
@@ -28,7 +26,7 @@ public class BoardPane extends Pane {
         this.gameMap = gameMap;
         for(int j=0; j<gameMap.getTiles()[0].length; j++){
             for(int i=0; i<gameMap.getTiles().length; i++){
-                this.getChildren().add(new ImageButton(gameMap.getTiles()[i][j].getImageName()));
+                this.getChildren().add(new EditorTileButton(gameMap.getTiles()[i][j].getImageName()));
             }
         }
     }

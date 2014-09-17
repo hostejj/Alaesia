@@ -6,23 +6,32 @@ import GameBoard.GameMap;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-public class EditorController {
+public class EditorController implements Initializable {
 
-    @FXML
-    private TabPane editorTab;
+    @FXML private TabPane editorTab;
+    @FXML private GridPane tileList;
 
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
 
     public void handleNewMap(ActionEvent actionEvent) {
         editorTab.getTabs().add(new Tab("Untitled Map.amap"));
