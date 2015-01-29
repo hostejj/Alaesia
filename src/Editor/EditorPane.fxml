@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import GUIs.TileListPane?>
-
+<?import GUIs.ToolPane?>
 <?import javafx.scene.image.ImageView?>
 <GridPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.EditorController">
     <children>
@@ -40,7 +40,7 @@
             <VBox prefHeight="200.0" prefWidth="200.0" >
             <children>
                 <Label text="Tools" />
-                <Button fx:id="selector" />
+                <ToolPane fx:id="toolPane" />
             </children></VBox>
             <ScrollPane prefHeight="376.0" prefWidth="200.0">
                <content>

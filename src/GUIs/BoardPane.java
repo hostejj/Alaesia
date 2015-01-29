@@ -64,6 +64,6 @@ public class BoardPane extends Pane {
     }
 
     public void update(Tile tile) {
-        boardPaneObserver.update(tile);
+        boardPaneObserver.updateBoard(tile);
     }
 }

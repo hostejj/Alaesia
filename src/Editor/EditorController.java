@@ -1,9 +1,6 @@
 package Editor;
 
-import GUIs.BoardPane;
-import GUIs.BoardPaneObserver;
-import GUIs.Navigator;
-import GUIs.TileListPane;
+import GUIs.*;
 import GameBoard.GameMap;
 import GameBoard.Tile;
 import javafx.application.Platform;
@@ -31,13 +28,16 @@ import java.util.ResourceBundle;
 public class EditorController implements Initializable, BoardPaneObserver {
 
     @FXML private TabPane editorTab;
+    @FXML private ToolPane toolPane = new ToolPane(this);
     @FXML private TileListPane tileList;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
 
     //Tool buttons and information
-    @FXML private Button selector;
     private static final Integer SELECTOR = 0;
     private static final Integer BRUSHWI = 1;
+    private static final Integer BRUSHWII = 2;
+    private static final Integer BRUSHWIII = 3;
+
     private Integer tool = 0; //The tool state is represented by an integer. 0 - selector
 
     //Current Tile and Associated information
@@ -48,11 +48,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
     @FXML private Label tileMovMod;
     @FXML private Label tileRetMod;
 
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        selector.setGraphic(new ImageView( new Image("Resources/InterfaceImages/cursor.png")));
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
@@ -180,9 +177,19 @@ public class EditorController implements Initializable, BoardPaneObserver {
         tileRetMod.setText(tile.getTerrain().getRetMod().toString());
     }
 
-    public void update(Tile tile){
+    public void updateBoard(Tile tile){
         if(tool.equals(SELECTOR)) {
             updateCurrentTile(tile);
+        } else if (tool.equals(BRUSHWI)){
+
+        } else if (tool.equals(BRUSHWII)){
+
+        } else if (tool.equals(BRUSHWIII)){
+
         }
+    }
+
+    public void updateTool(int tool){
+        this.tool = tool;
     }
 }
