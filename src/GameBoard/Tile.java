@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Tile implements Serializable {
     private Terrain terrain;
     private String imageName;
-    private int x;
-    private int y;
+
+    private Integer x;
+    private Integer y;
 
     public Tile(String imageName, int x, int y){
         this.terrain = new Terrain();
-        this.imageName = imageName;
         this.imageName = imageName;
         this.x = x;
         this.y = y;
@@ -24,11 +24,11 @@ public class Tile implements Serializable {
         return imageName;
     }
 
-    public int getX() {
+    public Integer getX() {
         return x;
     }
 
-    public int getY() {
+    public Integer getY() {
         return y;
     }
 }

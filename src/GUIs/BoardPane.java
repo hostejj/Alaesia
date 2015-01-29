@@ -1,6 +1,7 @@
 package GUIs;
 
 import GameBoard.GameMap;
+import GameBoard.Tile;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -13,6 +14,7 @@ import javafx.scene.layout.Pane;
 public class BoardPane extends Pane {
 
     private GameMap gameMap;
+    private BoardPaneObserver boardPaneObserver;
     private final int DELTAX = 33;
     private final int DELTAY = 20;
 
@@ -21,12 +23,13 @@ public class BoardPane extends Pane {
      * and adds them to the children list of the Pane.
      * @param gameMap The gameMap used to create the Pane graphics.
      */
-    public BoardPane(GameMap gameMap){
+    public BoardPane(GameMap gameMap, BoardPaneObserver boardPaneObserver){
         super();
         this.gameMap = gameMap;
+        this.boardPaneObserver = boardPaneObserver;
         for(int j=0; j<gameMap.getTiles()[0].length; j++){
             for(int i=0; i<gameMap.getTiles().length; i++){
-                this.getChildren().add(new EditorTileButton(gameMap.getTiles()[i][j].getImageName()));
+                this.getChildren().add(new EditorTileButton(gameMap.getTiles()[i][j], this));
             }
         }
     }
@@ -58,5 +61,9 @@ public class BoardPane extends Pane {
 
     public GameMap getGameMap() {
         return gameMap;
+    }
+
+    public void update(Tile tile) {
+        boardPaneObserver.update(tile);
     }
 }

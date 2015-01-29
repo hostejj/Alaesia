@@ -1,15 +1,22 @@
 package Editor;
 
 import GUIs.BoardPane;
+import GUIs.BoardPaneObserver;
 import GUIs.Navigator;
+import GUIs.TileListPane;
 import GameBoard.GameMap;
+import GameBoard.Tile;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -21,22 +28,38 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class EditorController implements Initializable {
+public class EditorController implements Initializable, BoardPaneObserver {
 
     @FXML private TabPane editorTab;
-    @FXML private GridPane tileList;
-
+    @FXML private TileListPane tileList;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
+
+    //Tool buttons and information
+    @FXML private Button selector;
+    private static final Integer SELECTOR = 0;
+    private static final Integer BRUSHWI = 1;
+    private Integer tool = 0; //The tool state is represented by an integer. 0 - selector
+
+    //Current Tile and Associated information
+    @FXML private ImageView selectedTile;
+    @FXML private Label tileLocation;
+    @FXML private Label tileDefMod;
+    @FXML private Label tileEvaMod;
+    @FXML private Label tileMovMod;
+    @FXML private Label tileRetMod;
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        selector.setGraphic(new ImageView( new Image("Resources/InterfaceImages/cursor.png")));
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
         editorTab.getTabs().add(new Tab("Untitled Map.amap"));
         openMaps.add(new GameMap());
         renderMap(openMaps.size()-1);
+        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]);
     }
 
     public void handleOpenMap(ActionEvent actionEvent) {
@@ -145,6 +168,21 @@ public class EditorController implements Initializable {
 
     public void renderMap(int index){
         Tab current = editorTab.getTabs().get(index);
-        current.setContent(new BoardPane(openMaps.get(index)));
+        current.setContent(new BoardPane(openMaps.get(index), this));
+    }
+
+    public void updateCurrentTile(Tile tile){
+        selectedTile.setImage(new Image(tile.getImageName()));
+        tileLocation.setText(tile.getX().toString() + ", " + tile.getY().toString());
+        tileDefMod.setText(tile.getTerrain().getDefMod().toString());
+        tileEvaMod.setText(tile.getTerrain().getEvaMod().toString());
+        tileMovMod.setText(tile.getTerrain().getMovMod().toString());
+        tileRetMod.setText(tile.getTerrain().getRetMod().toString());
+    }
+
+    public void update(Tile tile){
+        if(tool.equals(SELECTOR)) {
+            updateCurrentTile(tile);
+        }
     }
 }

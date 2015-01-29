@@ -9,7 +9,7 @@ public class GameMap implements Serializable {
     private Tile[][] tiles;
 
     public GameMap(){
-        tiles = new Tile[DEFAULTHEIGHT][DEFAULTWIDTH];
+        tiles = new Tile[DEFAULTWIDTH][DEFAULTHEIGHT];
         for(int j=0; j<tiles[0].length; j++){
             for(int i=0; i<tiles.length; i++){
                 tiles[i][j] = new Tile("Resources/TileImages/grass.png", i, j);
@@ -18,7 +18,7 @@ public class GameMap implements Serializable {
     }
 
     public GameMap(int height, int width){
-        tiles = new Tile[height][width];
+        tiles = new Tile[width][height];
         for(int j=0; j<tiles[0].length; j++){
             for(int i=0; i<tiles.length; i++){
                 tiles[i][j] = new Tile("Resources/TileImages/grass.png", i, j);
