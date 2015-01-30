@@ -30,10 +30,8 @@ public class ToolPane extends GridPane {
     private Button brushwII = new Button();
     private Button brushwIII = new Button();
 
-    public ToolPane(EditorController editorController){
+    public ToolPane(){
         super();
-
-        this.observer = editorController;
 
         setHgap(PANEHGAP);
 
@@ -45,7 +43,7 @@ public class ToolPane extends GridPane {
             public void handle(MouseEvent me) {
                 deselectButtons();
                 selector.setStyle(TOOL_CLICKED);
-                observer.updateTool(BRUSHWI);
+                observer.updateTool(SELECTOR);
             }
         });
 
@@ -56,7 +54,7 @@ public class ToolPane extends GridPane {
             public void handle(MouseEvent me) {
                 deselectButtons();
                 brushwI.setStyle(TOOL_CLICKED);
-                observer.updateTool(BRUSHWII);
+                observer.updateTool(BRUSHWI);
             }
         });
 
@@ -67,7 +65,7 @@ public class ToolPane extends GridPane {
             public void handle(MouseEvent me) {
                 deselectButtons();
                 brushwII.setStyle(TOOL_CLICKED);
-                observer.updateTool(BRUSHWIII);
+                observer.updateTool(BRUSHWII);
             }
         });
 
@@ -78,7 +76,7 @@ public class ToolPane extends GridPane {
             public void handle(MouseEvent me) {
                 deselectButtons();
                 brushwIII.setStyle(TOOL_CLICKED);
-                observer.updateTool(SELECTOR);
+                observer.updateTool(BRUSHWIII);
             }
         });
 
@@ -93,5 +91,9 @@ public class ToolPane extends GridPane {
         brushwI.setStyle(TOOL_NORMAL);
         brushwII.setStyle(TOOL_NORMAL);
         brushwIII.setStyle(TOOL_NORMAL);
+    }
+
+    public void register(EditorController editorController){
+        this.observer = editorController;
     }
 }

@@ -23,35 +23,40 @@ public class Terrain implements Serializable {
         this.retMod = retMod;
     }
 
+    public Terrain(Terrain t){
+        defMod = t.defMod;
+        evaMod = t.evaMod;
+        movMod = t.movMod;
+        retMod = t.retMod;
+    }
+
     public Integer getDefMod() {
         return defMod;
     }
-
     public void setDefMod(int defMod) {
         this.defMod = defMod;
     }
-
     public Integer getEvaMod() {
         return evaMod;
     }
-
     public void setEvaMod(int evaMod) {
         this.evaMod = evaMod;
     }
-
     public Integer getMovMod() {
         return movMod;
     }
-
     public void setMovMod(int movMod) {
         this.movMod = movMod;
     }
-
     public Integer getRetMod() {
         return retMod;
     }
-
     public void setRetMod(int retMod) {
         this.retMod = retMod;
+    }
+
+    @Override
+    public String toString(){
+        return "def = " +  defMod + "| eva = " + evaMod + "| mov = " + movMod + "| ret = " + retMod + "\n";
     }
 }

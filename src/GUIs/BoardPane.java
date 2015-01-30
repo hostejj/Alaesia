@@ -8,6 +8,8 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
+import java.util.ArrayList;
+
 /**
  * Displays a GameMap Object on a Pane.
  */
@@ -15,6 +17,7 @@ public class BoardPane extends Pane {
 
     private GameMap gameMap;
     private BoardPaneObserver boardPaneObserver;
+    private BoardPaneButton[][] boardPaneButtons;
     private final int DELTAX = 33;
     private final int DELTAY = 20;
 
@@ -25,11 +28,13 @@ public class BoardPane extends Pane {
      */
     public BoardPane(GameMap gameMap, BoardPaneObserver boardPaneObserver){
         super();
-        this.gameMap = gameMap;
+        this.gameMap = new GameMap(gameMap);
         this.boardPaneObserver = boardPaneObserver;
+        this.boardPaneButtons = new BoardPaneButton[gameMap.getWidth()][gameMap.getHeight()];
         for(int j=0; j<gameMap.getTiles()[0].length; j++){
             for(int i=0; i<gameMap.getTiles().length; i++){
-                this.getChildren().add(new EditorTileButton(gameMap.getTiles()[i][j], this));
+                boardPaneButtons[i][j] = new BoardPaneButton(gameMap.getTiles()[i][j], this);
+                this.getChildren().add(boardPaneButtons[i][j]);
             }
         }
     }
@@ -61,6 +66,10 @@ public class BoardPane extends Pane {
 
     public GameMap getGameMap() {
         return gameMap;
+    }
+
+    public BoardPaneButton[][] getBoardPaneButtons() {
+        return boardPaneButtons;
     }
 
     public void update(Tile tile) {

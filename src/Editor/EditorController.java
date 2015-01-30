@@ -2,6 +2,7 @@ package Editor;
 
 import GUIs.*;
 import GameBoard.GameMap;
+import GameBoard.Terrain;
 import GameBoard.Tile;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,17 +29,26 @@ import java.util.ResourceBundle;
 public class EditorController implements Initializable, BoardPaneObserver {
 
     @FXML private TabPane editorTab;
-    @FXML private ToolPane toolPane = new ToolPane(this);
-    @FXML private TileListPane tileList;
+    @FXML private ToolPane toolPane;
+    @FXML private TileListPane tileListPane;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
 
     //Tool buttons and information
     private static final Integer SELECTOR = 0;
     private static final Integer BRUSHWI = 1;
+    private static final Integer BRUSHWIW = 0;
     private static final Integer BRUSHWII = 2;
+    private static final Integer BRUSHWIIW = 1;
     private static final Integer BRUSHWIII = 3;
+    private static final Integer BRUSHWIIIW = 2;
 
     private Integer tool = 0; //The tool state is represented by an integer. 0 - selector
+
+    //Holds the tile being currently used as the brush paint.
+    private final String DEFAULTTILEDIR = "Resources/TileImages/grass.png";
+    private final int DEFAULTTILEX = -1;
+    private final int DEFAULTTILEY = -1;
+    private Tile brushTile = new Tile(DEFAULTTILEDIR, DEFAULTTILEX, DEFAULTTILEY);
 
     //Current Tile and Associated information
     @FXML private ImageView selectedTile;
@@ -50,6 +60,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        tileListPane.register(this);
+        toolPane.register(this);
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
@@ -75,7 +87,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
                 editorTab.getTabs().add(new Tab(mapFile.getName()));
                 openMaps.add(gameMap);
-                renderMap(openMaps.size()-1);
+                System.err.println(openMaps.size());
+                renderMap(openMaps.size() - 1);
             }
         } catch (ClassNotFoundException cnfe){
             cnfe.printStackTrace();
@@ -88,8 +101,11 @@ public class EditorController implements Initializable, BoardPaneObserver {
         Tab tabToRemove = null;
         for (Tab t:editorTab.getTabs()){
             if(t.isSelected()){
-                openMaps.remove(((BoardPane)t.getContent()).getGameMap());
+                System.err.println(openMaps.size());
+                openMaps.remove(editorTab.getTabs().indexOf(t));
+                System.err.println(openMaps.size());
                 tabToRemove = t;
+                break;
             }
         }
         if (tabToRemove != null){
@@ -130,7 +146,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
                     if (mapFile != null){
                         FileOutputStream fileOut = new FileOutputStream(mapFile);
                         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-
+                        System.err.println(((BoardPane)t.getContent()).getGameMap().toString());
                         out.writeObject(((BoardPane)t.getContent()).getGameMap());
                         out.close();
                         fileOut.close();
@@ -170,7 +186,11 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     public void updateCurrentTile(Tile tile){
         selectedTile.setImage(new Image(tile.getImageName()));
-        tileLocation.setText(tile.getX().toString() + ", " + tile.getY().toString());
+        if((tile.getX() == -1) && (tile.getY() == -1)){
+            tileLocation.setText("In Tile List");
+        } else {
+            tileLocation.setText(tile.getX().toString() + ", " + tile.getY().toString());
+        }
         tileDefMod.setText(tile.getTerrain().getDefMod().toString());
         tileEvaMod.setText(tile.getTerrain().getEvaMod().toString());
         tileMovMod.setText(tile.getTerrain().getMovMod().toString());
@@ -181,15 +201,58 @@ public class EditorController implements Initializable, BoardPaneObserver {
         if(tool.equals(SELECTOR)) {
             updateCurrentTile(tile);
         } else if (tool.equals(BRUSHWI)){
-
+            paintTile(tile, BRUSHWIW);
         } else if (tool.equals(BRUSHWII)){
-
+            paintTile(tile, BRUSHWIIW);
         } else if (tool.equals(BRUSHWIII)){
-
+            paintTile(tile, BRUSHWIIIW);
         }
+    }
+
+    public void updateBrushTile(Tile tile){
+        brushTile = new Tile(tile);
+        updateCurrentTile(brushTile);
     }
 
     public void updateTool(int tool){
         this.tool = tool;
+    }
+
+    public void paintTile(Tile tile, int radius){
+        for (Tab t:editorTab.getTabs()){
+            if(t.isSelected()){
+                BoardPane boardPane = ((BoardPane) t.getContent());
+                for(int y = tile.getY() - radius; y <= tile.getY() + radius; y++){
+                    for(int x = tile.getX() - radius; x <= tile.getX() + radius; x++){
+                        if((x>=0) && (y>=0) && (x < boardPane.getGameMap().getWidth()) && (y < boardPane.getGameMap().getHeight())){
+                            if(x%2==1){
+                                for(int r=0; r<=radius; r++) {
+                                    if ((Math.abs(x - tile.getX()) <= r) && (y >= (tile.getY() - (radius - r/2)))
+                                            && (y <= (tile.getY() + (radius - (r+1)/2)))) {
+                                        boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
+                                        boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getBoardPaneButtons()[x][y].setImage(new Image(brushTile.getImageName()));
+                                        break;
+                                    }
+                                }
+                            } else {
+                                for(int r=0; r<=radius; r++) {
+                                    if ((Math.abs(x - tile.getX()) <= r) && (y >= (tile.getY() - (radius - (r+1)/2)))
+                                            && (y <= (tile.getY() + (radius - r/2)))) {
+                                        boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
+                                        boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getBoardPaneButtons()[x][y].setImage(new Image(brushTile.getImageName()));
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
     }
 }

@@ -44,7 +44,7 @@
             </children></VBox>
             <ScrollPane prefHeight="376.0" prefWidth="200.0">
                <content>
-                  <TileListPane fx:id="tileList">
+                  <TileListPane fx:id="tileListPane">
                   </TileListPane>
                </content>
             </ScrollPane>

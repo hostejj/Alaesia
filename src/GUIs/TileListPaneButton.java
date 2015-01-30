@@ -3,22 +3,23 @@ package GUIs;
 import GameBoard.Tile;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
-public class EditorTileButton extends ImageView {
+public class TileListPaneButton extends TileButton{
 
-    private BoardPane observer;
-    private Tile tile;
+    private TileListPane observer;
 
-    private final String STYLE_NORMAL = "-fx-effect: null";
-    private final String STYLE_HOVER = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 60, 0, 0, 0)";
-    private final String STYLE_CLICKED = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.4), 60, 0, 0, 0)";
-
-    public EditorTileButton(Tile t, BoardPane boardPane) {
-        super(new Image(t.getImageName()));
+    public TileListPaneButton(Tile t, TileListPane tileListPane) {
+        super();
         this.tile = t;
-        observer = boardPane;
+
+        try {
+            this.setImage(new Image(t.getImageName()));
+        } catch (Exception e){
+            System.err.println("Could not find the tile image file. ");
+        }
+
+        observer = tileListPane;
 
         setOnMouseEntered(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
