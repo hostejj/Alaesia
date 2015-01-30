@@ -16,9 +16,10 @@ public class Navigator {
     /**
      * Convenience constants for fxml layouts managed by the navigator.
      */
+    public static final String EDITOR = "../EditorPane/EditorPane.fxml";
     public static final String MAINMENU = "MainMenu.fxml";
     public static final String PRIMARY = "PrimaryPane.fxml";
-    public static final String EDITOR = "../Editor/EditorPane.fxml";
+    public static final String STAGING = "../StagingPane/StagingPane.fxml";
 
     /** The main application layout controller. */
     private static PrimaryController primaryController;

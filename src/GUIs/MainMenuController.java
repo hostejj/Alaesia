@@ -19,5 +19,6 @@ public class MainMenuController {
     }
 
     public void handleSinglePlayerButtonAction() {
+        Navigator.loadScene(Navigator.STAGING);
     }
 }

@@ -3,10 +3,10 @@
 <?scenebuilder-stylesheet EditorPane.css?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import GUIs.TileListPane?>
-<?import GUIs.ToolPane?>
+<?import EditorPane.TileListPane?>
+<?import EditorPane.ToolPane?>
 <?import javafx.scene.image.ImageView?>
-<GridPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.EditorController">
+<GridPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="EditorPane.EditorController">
     <children>
         <MenuBar prefHeight="25.0" prefWidth="1024.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="0">
             <menus>

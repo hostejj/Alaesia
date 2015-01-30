@@ -21,7 +21,7 @@
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </VBox.margin>
                                 </Button>
-                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="140.0" text="Scenario Editor" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="140.0" text="Scenario EditorPane" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                                     <VBox.margin>
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </VBox.margin>

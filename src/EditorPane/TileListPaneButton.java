@@ -1,11 +1,12 @@
-package GUIs;
+package EditorPane;
 
+import GUIs.TileButton;
 import GameBoard.Tile;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-public class TileListPaneButton extends TileButton{
+public class TileListPaneButton extends TileButton {
 
     private TileListPane observer;
 

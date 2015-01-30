@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TabPane?>
+<?import StagingPane.OptionsPane?>
+<?import StagingPane.SelectionPane?>
+<GridPane prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="StagingPane.StagingController">
+    <children>
+        <VBox prefHeight="768.0" prefWidth="500.00" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <children>
+                <OptionsPane fx:id="optionsPane">
+                </OptionsPane>
+                <SelectionPane fx:id="selectionPane">
+                </SelectionPane>
+            </children>
+        </VBox>
+        <TabPane prefHeight="768.0" prefWidth="624.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+
+        </TabPane>
+    </children>
+</GridPane>
