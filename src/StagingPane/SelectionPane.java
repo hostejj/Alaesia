@@ -143,12 +143,10 @@ public class SelectionPane extends GridPane {
         if(dir.isDirectory()){
             File[] directoryListing = dir.listFiles();
             for (File child : directoryListing) {
-                System.err.println(child.getName());
                 if(child.getName().endsWith(".png") && (child.getName().contains("Front"))){
                     String unitData = (unitsDirName + child.getName()).replace(unitsDirName, unitsDatDirName)
                             .replace("Front", "").replace(".png", ".dat");
                     File datFile = new File(unitData);
-                    System.err.println(unitData);
                     if(datFile.isFile()){
                         if(loadData(unitData)){
                             unitList.add(unitsMSDirName + child.getName());
@@ -171,20 +169,53 @@ public class SelectionPane extends GridPane {
             String fileData = new String(encoded, Charset.defaultCharset());
             String peeledData = new String(fileData);
             {
-                String defMod = peeledData.substring(0,peeledData.indexOf(';'));
+                String imageName = fileName.replace(".dat", "Front.png").replace("src/", "").replace("Data", "Images");
+                String charName = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
-                String evaMod = peeledData.substring(0,peeledData.indexOf(';'));
-                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
-                String movMod = peeledData.substring(0,peeledData.indexOf(';'));
-                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
-                String retMod = peeledData.substring(0,peeledData.indexOf(';'));
-                try {
-                    Integer def = Integer.parseInt(defMod);
-                    Integer eva = Integer.parseInt(evaMod);
-                    Integer mov = Integer.parseInt(movMod);
-                    Integer ret = Integer.parseInt(retMod);
+                String typeName = peeledData.substring(0,peeledData.indexOf(';'));
 
-                    Unit u = new Unit();
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String typeCostS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String ACCS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String APTS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String DEFS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String EVAS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String EXPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String HPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String LEVELS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String MOVES = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String MPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String RANGES = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String RETS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String STRS = peeledData.substring(0,peeledData.indexOf(';'));
+                try {
+                    Integer typeCost = Integer.parseInt(typeCostS);
+                    Integer acc = Integer.parseInt(ACCS);
+                    Integer apt = Integer.parseInt(APTS);
+                    Integer def = Integer.parseInt(DEFS);
+                    Integer eva = Integer.parseInt(EVAS);
+                    Integer exp = Integer.parseInt(EXPS);
+                    Integer hp = Integer.parseInt(HPS);
+                    Integer level = Integer.parseInt(LEVELS);
+                    Integer move = Integer.parseInt(MOVES);
+                    Integer mp = Integer.parseInt(MPS);
+                    Integer range = Integer.parseInt(RANGES);
+                    Integer ret = Integer.parseInt(RETS);
+                    Integer str = Integer.parseInt(STRS);
+
+                    Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, def, eva, exp, hp, level, move, mp, range, ret, str);
                     SelectionPaneUnitButton selectionPaneUnitButton = new SelectionPaneUnitButton(u, this);
                     units.add(selectionPaneUnitButton);
                 } catch (NumberFormatException nfe){

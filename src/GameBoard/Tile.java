@@ -3,11 +3,20 @@ package GameBoard;
 import java.io.Serializable;
 
 public class Tile implements Serializable {
+    private final String DEFAULTTILEDIR = "Resources/TileImages/grass.png";
+
     private Terrain terrain;
     private String imageName;
 
     private Integer x;
     private Integer y;
+
+    public Tile(int x, int y){
+        this.imageName = DEFAULTTILEDIR;
+        this.terrain = new Terrain();
+        this.x = x;
+        this.y = y;
+    }
 
     public Tile(String imageName, int x, int y){
         this.imageName = imageName;

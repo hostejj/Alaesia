@@ -30,7 +30,7 @@ public class Unit {
         this.EVA = 10;
         this.EXP = 0;
         this.HP = 15;
-        this.LEVEL = 0;
+        this.LEVEL = 1;
         this.MOVE = 5;
         this.MP = 0;
         this.RANGE = 1;
@@ -40,7 +40,7 @@ public class Unit {
     }
 
     public Unit(String imageName, String charName, String typeName, Integer typeVal, Integer ACC, Integer APT, Integer DEF, Integer EVA,
-                Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP, Integer RANGE, Integer RET, Integer STR, Integer VALUE) {
+                Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP, Integer RANGE, Integer RET, Integer STR) {
         this.imageName = imageName;
         this.charName = charName;
         this.typeName = typeName;
@@ -57,7 +57,7 @@ public class Unit {
         this.RANGE = RANGE;
         this.RET = RET;
         this.STR = STR;
-        this.VALUE = VALUE;
+        this.VALUE = typeVal;
     }
 
     public Unit(Unit u) {

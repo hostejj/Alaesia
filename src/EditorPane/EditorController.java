@@ -6,17 +6,19 @@ import GameBoard.Terrain;
 import GameBoard.Tile;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -63,10 +65,71 @@ public class EditorController implements Initializable, BoardPaneObserver {
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
+        {
+            final GameMap gameMap = new GameMap();
+            Stage popup = new Stage();
+            GridPane popupGrid = new GridPane();
+            Label mapNameL = new Label( "Map Name: ");
+            TextField mapName = new TextField(gameMap.getDEFAULTNAME());
+            Label maxPlayersL = new Label("Number of Players: ");
+
+            Button newMap = new Button("New Map");
+            Button back = new Button("Back");
+
+            ComboBox<Integer> maxPlayers = new ComboBox<Integer>();
+            {
+                for(int i = gameMap.getMINPLAYERS(); i <= gameMap.getMAXPLAYERS(); i++){
+                    maxPlayers.getItems().add(new Integer(i));
+                }
+                maxPlayers.setValue(gameMap.getDEFAULTPLAYERS());
+            }
+
+            Label widthL = new Label("Width: ");
+            ComboBox<Integer> width = new ComboBox<Integer>();
+            {
+                for(int i = gameMap.getMINWIDTH(); i <= gameMap.getMAXWIDTH(); i++){
+                    width.getItems().add(new Integer(i));
+                }
+                width.setValue(gameMap.getDEFAULTWIDTH());
+            }
+
+
+            Label heightL =  new Label("Height: ");
+            ComboBox<Integer> height = new ComboBox<Integer>();
+            {
+                for(int i = gameMap.getMINHEIGHT(); i <= gameMap.getMAXHEIGHT(); i++){
+                    height.getItems().add(new Integer(i));
+                }
+                height.setValue(gameMap.getDEFAULTHEIGHT());
+            }
+
+
+            popupGrid.add(mapNameL,0,0,2,1);
+            popupGrid.add(mapName,2,0,2,1);
+            popupGrid.add(maxPlayersL,0,1,2,1);
+            popupGrid.add(maxPlayers,2,1,2,1);
+            popupGrid.add(widthL,0,2);
+            popupGrid.add(heightL,2,2);
+            popupGrid.add(width,1,2);
+            popupGrid.add(height,3,2);
+
+            Scene popupScene = new Scene(popupGrid, 300, 300);
+            popup.setScene(popupScene);
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.show();
+
+            newMap.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                }
+            });
+        }
+
+        /*
         editorTab.getTabs().add(new Tab("Untitled Map.amap"));
         openMaps.add(new GameMap());
         renderMap(openMaps.size()-1);
-        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]);
+        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]); */
     }
 
     public void handleOpenMap(ActionEvent actionEvent) {

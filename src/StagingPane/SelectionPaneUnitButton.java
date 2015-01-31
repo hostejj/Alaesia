@@ -22,7 +22,7 @@ public class SelectionPaneUnitButton extends ImageView {
         try {
             this.setImage(new Image(u.getImageName()));
         } catch (Exception e){
-            System.err.println("Could not find the tile image file. ");
+            System.err.println("Could not find the unit image file. ");
         }
 
         observer = selectionPane;
