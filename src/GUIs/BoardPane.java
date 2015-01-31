@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
@@ -31,12 +32,13 @@ public class BoardPane extends Pane {
         this.gameMap = new GameMap(gameMap);
         this.boardPaneObserver = boardPaneObserver;
         this.boardPaneButtons = new BoardPaneButton[gameMap.getWidth()][gameMap.getHeight()];
-        for(int j=0; j<gameMap.getTiles()[0].length; j++){
-            for(int i=0; i<gameMap.getTiles().length; i++){
+        for(int j=0; j<gameMap.getHeight(); j++){
+            for(int i=0; i<gameMap.getWidth(); i++){
                 boardPaneButtons[i][j] = new BoardPaneButton(gameMap.getTiles()[i][j], this);
                 this.getChildren().add(boardPaneButtons[i][j]);
             }
         }
+        setMinSize(DELTAX*(gameMap.getWidth())+(DELTAX/3-2), (2*DELTAY)*(gameMap.getHeight())+DELTAY);
     }
 
     @Override
@@ -51,8 +53,12 @@ public class BoardPane extends Pane {
         for(Node n:boardTiles){
             layoutInArea(n,x,y,DELTAX/3-1,DELTAY,0, HPos.CENTER, VPos.CENTER);
             x += DELTAX;
-            if(x/DELTAX >= this.gameMap.getDEFAULTWIDTH()) {
-                y += 2*DELTAY;
+            if(x/DELTAX >= this.gameMap.getWidth()) {
+                if((x/DELTAX)%2==1){
+                    y += 2*DELTAY;
+                } else {
+                    y += DELTAY;
+                }
                 x = DELTAX/2;
             } else {
                 if((x/DELTAX)%2==1){

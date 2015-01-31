@@ -17,9 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 import java.io.*;
 import java.net.URL;
@@ -32,6 +30,9 @@ public class EditorController implements Initializable, BoardPaneObserver {
     @FXML private ToolPane toolPane;
     @FXML private TileListPane tileListPane;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
+
+    //New Map Data Storage and Flag
+    private boolean nmdFlag;
 
     //Tool buttons and information
     private static final Integer SELECTOR = 0;
@@ -65,71 +66,9 @@ public class EditorController implements Initializable, BoardPaneObserver {
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
-        {
-            final GameMap gameMap = new GameMap();
-            Stage popup = new Stage();
-            GridPane popupGrid = new GridPane();
-            Label mapNameL = new Label( "Map Name: ");
-            TextField mapName = new TextField(gameMap.getDEFAULTNAME());
-            Label maxPlayersL = new Label("Number of Players: ");
-
-            Button newMap = new Button("New Map");
-            Button back = new Button("Back");
-
-            ComboBox<Integer> maxPlayers = new ComboBox<Integer>();
-            {
-                for(int i = gameMap.getMINPLAYERS(); i <= gameMap.getMAXPLAYERS(); i++){
-                    maxPlayers.getItems().add(new Integer(i));
-                }
-                maxPlayers.setValue(gameMap.getDEFAULTPLAYERS());
-            }
-
-            Label widthL = new Label("Width: ");
-            ComboBox<Integer> width = new ComboBox<Integer>();
-            {
-                for(int i = gameMap.getMINWIDTH(); i <= gameMap.getMAXWIDTH(); i++){
-                    width.getItems().add(new Integer(i));
-                }
-                width.setValue(gameMap.getDEFAULTWIDTH());
-            }
-
-
-            Label heightL =  new Label("Height: ");
-            ComboBox<Integer> height = new ComboBox<Integer>();
-            {
-                for(int i = gameMap.getMINHEIGHT(); i <= gameMap.getMAXHEIGHT(); i++){
-                    height.getItems().add(new Integer(i));
-                }
-                height.setValue(gameMap.getDEFAULTHEIGHT());
-            }
-
-
-            popupGrid.add(mapNameL,0,0,2,1);
-            popupGrid.add(mapName,2,0,2,1);
-            popupGrid.add(maxPlayersL,0,1,2,1);
-            popupGrid.add(maxPlayers,2,1,2,1);
-            popupGrid.add(widthL,0,2);
-            popupGrid.add(heightL,2,2);
-            popupGrid.add(width,1,2);
-            popupGrid.add(height,3,2);
-
-            Scene popupScene = new Scene(popupGrid, 300, 300);
-            popup.setScene(popupScene);
-            popup.initModality(Modality.APPLICATION_MODAL);
-            popup.show();
-
-            newMap.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                }
-            });
-        }
-
-        /*
-        editorTab.getTabs().add(new Tab("Untitled Map.amap"));
-        openMaps.add(new GameMap());
-        renderMap(openMaps.size()-1);
-        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]); */
+        EditorPopup editorPopup = new EditorPopup();
+        editorPopup.register(this);
+        editorPopup.show();
     }
 
     public void handleOpenMap(ActionEvent actionEvent) {
@@ -207,7 +146,6 @@ public class EditorController implements Initializable, BoardPaneObserver {
                     if (mapFile != null){
                         FileOutputStream fileOut = new FileOutputStream(mapFile);
                         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                        System.err.println(((BoardPane)t.getContent()).getGameMap().toString());
                         out.writeObject(((BoardPane)t.getContent()).getGameMap());
                         out.close();
                         fileOut.close();
@@ -242,7 +180,12 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     public void renderMap(int index){
         Tab current = editorTab.getTabs().get(index);
-        current.setContent(new BoardPane(openMaps.get(index), this));
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        BoardPane boardPane = new BoardPane(openMaps.get(index), this);
+        scrollPane.setContent(boardPane);
+        current.setContent(scrollPane);
     }
 
     public void updateCurrentTile(Tile tile){
@@ -279,10 +222,17 @@ public class EditorController implements Initializable, BoardPaneObserver {
         this.tool = tool;
     }
 
+    public void createNewMap(String mapName, Integer width, Integer height, Integer maxPlayers){
+        editorTab.getTabs().add(new Tab(mapName + ".amap"));
+        openMaps.add(new GameMap(mapName, width, height, maxPlayers));
+        renderMap(openMaps.size()-1);
+        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]);
+    }
+
     public void paintTile(Tile tile, int radius){
         for (Tab t:editorTab.getTabs()){
             if(t.isSelected()){
-                BoardPane boardPane = ((BoardPane) t.getContent());
+                BoardPane boardPane = ((BoardPane) (((ScrollPane) t.getContent())).getContent());
                 for(int y = tile.getY() - radius; y <= tile.getY() + radius; y++){
                     for(int x = tile.getX() - radius; x <= tile.getX() + radius; x++){
                         if((x>=0) && (y>=0) && (x < boardPane.getGameMap().getWidth()) && (y < boardPane.getGameMap().getHeight())){
