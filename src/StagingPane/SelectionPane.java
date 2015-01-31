@@ -1,17 +1,40 @@
 package StagingPane;
 
+import GameConcepts.Unit;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.IntSummaryStatistics;
 
 public class SelectionPane extends GridPane {
 
     private StagingController observer;
     private ScrollPane selectionWindow = new ScrollPane();
 
+    private final String unitsDirName = "src/Resources/UnitImages/";
+    private final String unitsMSDirName = "Resources/UnitImages/";
+    private final String unitsDatDirName = "src/Resources/UnitData/";
+
+    public ArrayList<String> unitList = new ArrayList<String>();
+    public ArrayList<SelectionPaneUnitButton> units = new ArrayList<SelectionPaneUnitButton>();
+    private final int MAXWIDTH = 1;
+    private static int columnIndex = 0;
+    private static int rowIndex = 0;
+
     //DataWindow vars
+    private Unit selectedUnit = new Unit();
     private ImageView unitImage = new ImageView();
     private Label charName = new Label("Name: ");
     private Label charNameV = new Label("");
@@ -47,6 +70,8 @@ public class SelectionPane extends GridPane {
     public SelectionPane(){
         super();
         addSelectNodes();
+        loadUnits();
+        addUnits();
     }
 
     public void addSelectNodes(){
@@ -85,9 +110,114 @@ public class SelectionPane extends GridPane {
         add(changeName, 1, 8);
         add(addUnit, 2, 8);
         add(removeUnit, 3, 8);
+
+
+        changeName.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+                selectedUnit.setCharName("John");
+                charNameV.setText(selectedUnit.getCharName());
+            }
+        });
+    }
+
+    /**
+     * Add the found units into the Pane.
+     */
+    public void addUnits(){
+        for(SelectionPaneUnitButton button: units){
+            if(columnIndex > MAXWIDTH){
+                columnIndex = 0;
+                rowIndex++;
+            }
+            add(button , columnIndex++, rowIndex);
+        }
+    }
+
+    /**
+     * Search through the resource directories to load the available (having a png
+     * and dat file) units into the selectionPane. Also load the associated data
+     * from the dat file about the unit stats.
+     */
+    public void loadUnits(){
+        File dir = new File(unitsDirName);
+        if(dir.isDirectory()){
+            File[] directoryListing = dir.listFiles();
+            for (File child : directoryListing) {
+                System.err.println(child.getName());
+                if(child.getName().endsWith(".png") && (child.getName().contains("Front"))){
+                    String unitData = (unitsDirName + child.getName()).replace(unitsDirName, unitsDatDirName)
+                            .replace("Front", "").replace(".png", ".dat");
+                    File datFile = new File(unitData);
+                    System.err.println(unitData);
+                    if(datFile.isFile()){
+                        if(loadData(unitData)){
+                            unitList.add(unitsMSDirName + child.getName());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads the data from a file about a unit's statistics into a unit variable.
+     * @param fileName The name of the file that contains a units info.
+     * @return Return true if the load into a unit variable was successful.
+     *         Returns false otherwise.
+     */
+    public boolean loadData(String fileName){
+        try{
+            byte[] encoded = Files.readAllBytes(Paths.get(fileName));
+            String fileData = new String(encoded, Charset.defaultCharset());
+            String peeledData = new String(fileData);
+            {
+                String defMod = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String evaMod = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String movMod = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String retMod = peeledData.substring(0,peeledData.indexOf(';'));
+                try {
+                    Integer def = Integer.parseInt(defMod);
+                    Integer eva = Integer.parseInt(evaMod);
+                    Integer mov = Integer.parseInt(movMod);
+                    Integer ret = Integer.parseInt(retMod);
+
+                    Unit u = new Unit();
+                    SelectionPaneUnitButton selectionPaneUnitButton = new SelectionPaneUnitButton(u, this);
+                    units.add(selectionPaneUnitButton);
+                } catch (NumberFormatException nfe){
+                    System.err.println("There was an error with the numerical data in the file " + fileName);
+                    return false;
+                }
+            }
+            return true;
+        } catch (IOException ioe){
+            System.err.println("There was an error reading the data file " + fileName);
+            return false;
+        }
     }
 
     public void register(StagingController stagingController){
         this.observer = stagingController;
+    }
+
+    public void updateSelectedUnit(Unit u){
+        selectedUnit = new Unit(u);
+        unitImage.setImage(new Image(selectedUnit.getImageName()));
+        typeNameV.setText(u.getTypeName());
+        typeValV.setText(u.getTypeVal().toString());
+        charNameV.setText(u.getCharName());
+        HPV.setText(u.getHP().toString());
+        MPV.setText(u.getMP().toString());
+        APTV.setText(u.getAPT().toString());
+        MOVEV.setText(u.getMOVE().toString());
+        RANGEV.setText(u.getRANGE().toString());
+        ACCV.setText(u.getACC().toString());
+        EVAV.setText(u.getEVA().toString());
+        STRV.setText(u.getSTR().toString());
+        DEFV.setText(u.getDEF().toString());
+        RETV.setText(u.getRET().toString());
     }
 }

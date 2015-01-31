@@ -1,10 +1,13 @@
 package StagingPane;
 
+import GUIs.BoardPane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 public class OptionsPane extends GridPane {
 
@@ -39,6 +42,10 @@ public class OptionsPane extends GridPane {
     private Slider turnLimitSlide;
     private Label tlSlideVal;
 
+    private HBox buttons;
+    private Button start;
+    private Button back;
+
     public OptionsPane(){
         super();
         initOptionNodes();
@@ -58,6 +65,10 @@ public class OptionsPane extends GridPane {
         add(turnLimit, 0, 3);
         add(turnLimitSlide, 1, 3);
         add(tlSlideVal, 2, 3);
+
+        buttons.getChildren().add(start);
+        buttons.getChildren().add(back);
+        add(buttons, 0, 4, 4, 1);
     }
 
     public void initOptionNodes(){
@@ -65,6 +76,9 @@ public class OptionsPane extends GridPane {
         armyPoints = new Label("Army Points");
         turnPoints = new Label("Turn Points");
         turnLimit = new Label("Turn Limit");
+        buttons = new HBox();
+        start = new Button("Start Game");
+        back = new Button("Back To Menu");
 
         playersSlide = new Slider(MINPLAYERS, MAXPLAYERS, DEFPLAYERS);
         playersSlide.setMajorTickUnit(SLIDEMINTICK);

@@ -1,6 +1,7 @@
 package GameConcepts;
 
 public class Unit {
+    private String imageName;
     private String charName;
     private String typeName;
     private Integer typeVal;
@@ -18,8 +19,29 @@ public class Unit {
     private Integer STR;
     private Integer VALUE;
 
-    public Unit(String charName, String typeName, Integer typeVal, Integer ACC, Integer APT, Integer DEF, Integer EVA, Integer EXP,
-                Integer HP, Integer LEVEL, Integer MOVE, Integer MP, Integer RANGE, Integer RET, Integer STR, Integer VALUE) {
+    public Unit(){
+        this.imageName = "Resources/UnitImages/WarriorFront.png";
+        this.charName = "John";
+        this.typeName = "Warrior";
+        this.typeVal = 2;
+        this.ACC = 85;
+        this.APT = 2;
+        this.DEF = 3;
+        this.EVA = 10;
+        this.EXP = 0;
+        this.HP = 15;
+        this.LEVEL = 0;
+        this.MOVE = 5;
+        this.MP = 0;
+        this.RANGE = 1;
+        this.RET = 1;
+        this.STR = 6;
+        this.VALUE = calcVALUE();
+    }
+
+    public Unit(String imageName, String charName, String typeName, Integer typeVal, Integer ACC, Integer APT, Integer DEF, Integer EVA,
+                Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP, Integer RANGE, Integer RET, Integer STR, Integer VALUE) {
+        this.imageName = imageName;
         this.charName = charName;
         this.typeName = typeName;
         this.typeVal = typeVal;
@@ -36,6 +58,34 @@ public class Unit {
         this.RET = RET;
         this.STR = STR;
         this.VALUE = VALUE;
+    }
+
+    public Unit(Unit u) {
+        this.imageName = u.imageName;
+        this.charName = u.charName;
+        this.typeName = u.typeName;
+        this.typeVal = u.typeVal;
+        this.ACC = u.ACC;
+        this.APT = u.APT;
+        this.DEF = u.DEF;
+        this.EVA = u.EVA;
+        this.EXP = u.EXP;
+        this.HP = u.HP;
+        this.LEVEL = u.LEVEL;
+        this.MOVE = u.MOVE;
+        this.MP = u.MP;
+        this.RANGE = u.RANGE;
+        this.RET = u.RET;
+        this.STR = u.STR;
+        this.VALUE = u.VALUE;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getCharName() {
@@ -156,6 +206,11 @@ public class Unit {
 
     public void setSTR(Integer STR) {
         this.STR = STR;
+    }
+
+    public Integer calcVALUE(){
+        //calculate current worth of the unit
+        return 5;
     }
 
     public Integer getVALUE() {
