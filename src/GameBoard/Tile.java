@@ -63,6 +63,30 @@ public class Tile implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tile)) return false;
+
+        Tile tile = (Tile) o;
+
+        if (!imageName.equals(tile.imageName)) return false;
+        if (!terrain.equals(tile.terrain)) return false;
+        if (!x.equals(tile.x)) return false;
+        if (!y.equals(tile.y)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = terrain.hashCode();
+        result = 31 * result + imageName.hashCode();
+        result = 31 * result + x.hashCode();
+        result = 31 * result + y.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Tile{" +
                 ", imageName='" + imageName + '\'' +

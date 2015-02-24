@@ -2,14 +2,16 @@ package GUIs;
 
 import GameBoard.Tile;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
-public abstract class TileButton extends ImageView {
+import java.util.ArrayList;
+
+public abstract class TileButton extends StackPane {
 
     protected Tile tile;
-
-    protected final String STYLE_NORMAL = "-fx-effect: null";
-    protected final String STYLE_HOVER = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 60, 0, 0, 0)";
-    protected final String STYLE_CLICKED = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.4), 60, 0, 0, 0)";
+    protected ImageView tileImage;
+    protected ArrayList<ImageView> shades = new ArrayList<ImageView>();
+    protected ImageView unitImage;
 
     public TileButton() {
         super();
@@ -17,5 +19,15 @@ public abstract class TileButton extends ImageView {
 
     public Tile getTile() {
         return tile;
+    }
+
+    public ImageView getTileImage() { return tileImage; }
+
+    public ImageView getUnitImage() {
+        return unitImage;
+    }
+
+    public void setUnitImage(ImageView unitImage) {
+        this.unitImage = unitImage;
     }
 }

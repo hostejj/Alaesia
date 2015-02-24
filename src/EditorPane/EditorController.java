@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.*;
@@ -31,10 +30,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
     @FXML private TileListPane tileListPane;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
 
-    //New Map Data Storage and Flag
-    private boolean nmdFlag;
-
     //Tool buttons and information
+    private Integer tool = 0; //The tool state is represented by an integer.
     private static final Integer SELECTOR = 0;
     private static final Integer BRUSHWI = 1;
     private static final Integer BRUSHWIW = 0;
@@ -42,11 +39,25 @@ public class EditorController implements Initializable, BoardPaneObserver {
     private static final Integer BRUSHWIIW = 1;
     private static final Integer BRUSHWIII = 3;
     private static final Integer BRUSHWIIIW = 2;
+    private static final Integer SLBRUSH = 4;
 
-    private Integer tool = 0; //The tool state is represented by an integer. 0 - selector
+    //Player Starting Location tool color chooser.
+    @FXML private Button playerSLC = new Button();
+    private static Integer playerSLCState = 1;
+    private String SLSTRING = "Resources/InterfaceImages/pslshade";
+    private String pslStyleOne = "-fx-text-fill: blue; -fx-font-size: 18px; -fx-font-weight: bold;";
+    private String pslStyleTwo = "-fx-text-fill: red; -fx-font-size: 18px; -fx-font-weight: bold;";
+    private String pslStyleThree = "-fx-text-fill: green; -fx-font-size: 18px; -fx-font-weight: bold;";
+    private String pslStyleFour = "-fx-text-fill: orange; -fx-font-size: 18px; -fx-font-weight: bold;";
+
+
+    private static final int COMPMINW = 40;
+    private static final int COMPMAXW = 40;
+    private static final int COMPMINH = 40;
+    private static final int COMPMAXH = 40;
 
     //Holds the tile being currently used as the brush paint.
-    private final String DEFAULTTILEDIR = "Resources/TileImages/grass.png";
+    private final String DEFAULTTILEDIR = "/TileImages/grass.png";
     private final int DEFAULTTILEX = -1;
     private final int DEFAULTTILEY = -1;
     private Tile brushTile = new Tile(DEFAULTTILEDIR, DEFAULTTILEX, DEFAULTTILEY);
@@ -61,8 +72,48 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //register as and observer
         tileListPane.register(this);
         toolPane.register(this);
+
+
+        // component styles
+        playerSLC.setMinSize(COMPMINW, COMPMINH);
+        playerSLC.setMaxSize(COMPMAXW, COMPMAXH);
+        playerSLC.setText(((Integer)playerSLCState).toString());
+        playerSLC.setStyle(pslStyleOne);
+
+        //component actions
+        playerSLC.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Integer openIndex = null;
+                for (Tab t:editorTab.getTabs()){
+                    if(t.isSelected()){
+                        openIndex = editorTab.getTabs().indexOf(t);
+                        break;
+                    }
+                }
+                if(openIndex != null) {
+                    if (playerSLCState < ((BoardPane) ((ScrollPane) editorTab.getTabs().get(openIndex).getContent()).getContent()).getGameMap().getMaxPlayers()){
+                        playerSLCState++;
+                    } else {
+                        playerSLCState = 1;
+                    }
+                    playerSLC.setText(((Integer) playerSLCState).toString());
+
+                    if(playerSLCState == 1){
+                        playerSLC.setStyle(pslStyleOne);
+                    } else if(playerSLCState == 2){
+                        playerSLC.setStyle(pslStyleTwo);
+                    } else if(playerSLCState == 3){
+                        playerSLC.setStyle(pslStyleThree);
+                    } else if(playerSLCState == 4){
+                        playerSLC.setStyle(pslStyleFour);
+                    }
+                }
+            }
+        });
     }
 
     public void handleNewMap(ActionEvent actionEvent) {
@@ -74,7 +125,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
     public void handleOpenMap(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Map to Open");
-        fileChooser.setInitialDirectory(new File("src/Resources/Maps"));
+        fileChooser.setInitialDirectory(new File("Resources/Maps"));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Alaesia Map Files (.amap)", "*.amap"));
         try{
             File mapFile = fileChooser.showOpenDialog(new Stage());
@@ -101,9 +152,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
         Tab tabToRemove = null;
         for (Tab t:editorTab.getTabs()){
             if(t.isSelected()){
-                System.err.println(openMaps.size());
                 openMaps.remove(editorTab.getTabs().indexOf(t));
-                System.err.println(openMaps.size());
                 tabToRemove = t;
                 break;
             }
@@ -121,7 +170,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
                     FileOutputStream fileOut = new FileOutputStream(mapFile);
                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-                    out.writeObject(((BoardPane)t.getContent()).getGameMap());
+                    out.writeObject(((BoardPane) ((ScrollPane) t.getContent()).getContent()).getGameMap());
                     out.close();
                     fileOut.close();
 
@@ -139,14 +188,14 @@ public class EditorController implements Initializable, BoardPaneObserver {
             if(t.isSelected()){
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Enter a Name to Save As");
-                fileChooser.setInitialDirectory(new File("src/Resources/Maps"));
+                fileChooser.setInitialDirectory(new File("Resources/Maps"));
                 fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Alaesia Map Files (.amap)", "*.amap"));
                 try{
                     File mapFile = fileChooser.showSaveDialog(new Stage());
                     if (mapFile != null){
                         FileOutputStream fileOut = new FileOutputStream(mapFile);
                         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                        out.writeObject(((BoardPane)t.getContent()).getGameMap());
+                        out.writeObject(((BoardPane)((ScrollPane)t.getContent()).getContent()).getGameMap());
                         out.close();
                         fileOut.close();
 
@@ -189,16 +238,21 @@ public class EditorController implements Initializable, BoardPaneObserver {
     }
 
     public void updateCurrentTile(Tile tile){
-        selectedTile.setImage(new Image(tile.getImageName()));
-        if((tile.getX() == -1) && (tile.getY() == -1)){
-            tileLocation.setText("In Tile List");
-        } else {
-            tileLocation.setText(tile.getX().toString() + ", " + tile.getY().toString());
+        try {
+            selectedTile.setImage(new Image(new File(tile.getImageName()).toURI().toString()));
+            if ((tile.getX() == -1) && (tile.getY() == -1)) {
+                tileLocation.setText("In Tile List");
+            } else {
+                tileLocation.setText(tile.getX().toString() + ", " + tile.getY().toString());
+            }
+            tileDefMod.setText(tile.getTerrain().getDefMod().toString());
+            tileEvaMod.setText(tile.getTerrain().getEvaMod().toString());
+            tileMovMod.setText(tile.getTerrain().getMovMod().toString());
+            tileRetMod.setText(tile.getTerrain().getRetMod().toString());
+        } catch (IllegalArgumentException iae){
+            System.err.println(iae.toString());
         }
-        tileDefMod.setText(tile.getTerrain().getDefMod().toString());
-        tileEvaMod.setText(tile.getTerrain().getEvaMod().toString());
-        tileMovMod.setText(tile.getTerrain().getMovMod().toString());
-        tileRetMod.setText(tile.getTerrain().getRetMod().toString());
+
     }
 
     public void updateBoard(Tile tile){
@@ -210,6 +264,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
             paintTile(tile, BRUSHWIIW);
         } else if (tool.equals(BRUSHWIII)){
             paintTile(tile, BRUSHWIIIW);
+        } else if (tool.equals(SLBRUSH)){
+            changeStartingLocation(tile);
         }
     }
 
@@ -243,7 +299,9 @@ public class EditorController implements Initializable, BoardPaneObserver {
                                         boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
                                         boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
-                                        boardPane.getBoardPaneButtons()[x][y].setImage(new Image(brushTile.getImageName()));
+                                        boardPane.getBoardPaneButtons()[x][y].getTile().setImageName(brushTile.getImageName());
+                                        boardPane.getBoardPaneButtons()[x][y].getTileImage().setImage(
+                                                new Image(new File( brushTile.getImageName()).toURI().toString()));
                                         break;
                                     }
                                 }
@@ -254,12 +312,50 @@ public class EditorController implements Initializable, BoardPaneObserver {
                                         boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
                                         boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
-                                        boardPane.getBoardPaneButtons()[x][y].setImage(new Image(brushTile.getImageName()));
+                                        boardPane.getBoardPaneButtons()[x][y].getTile().setImageName(brushTile.getImageName());
+                                        boardPane.getBoardPaneButtons()[x][y].getTileImage().setImage(
+                                                new Image(new File( brushTile.getImageName()).toURI().toString()));
                                         break;
                                     }
                                 }
                             }
                         }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    //adds or removes a starting location from the map
+    public void changeStartingLocation(Tile tile){
+        for (Tab t:editorTab.getTabs()) {
+            if (t.isSelected()) {
+                BoardPane boardPane = ((BoardPane) (((ScrollPane) t.getContent())).getContent());
+                if(playerSLCState <= boardPane.getGameMap().getMaxPlayers()){
+                    //check if the tile is already in the list
+                    for(Tile cltile: boardPane.getGameMap().getStartLocs().get(playerSLCState - 1)){
+                        if(cltile.equals(tile)){
+                            //remove the tile
+                            boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).remove(cltile);
+
+                            //remove the coloring on the editor
+                            boardPane.getBoardPaneButtons()[tile.getX()][tile.getY()].removeShade(playerSLCState - 1);
+
+                            return;
+                        }
+                    }
+
+                    //the tile was not found in the list already, so add the tile
+                    boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).add(tile);
+
+                    //add color the tile on the editor
+                    try {
+                        String shadeName = SLSTRING + playerSLCState.toString() + ".png";
+                        ImageView shadeImage = new ImageView(new Image(new File(shadeName).toURI().toString()));
+                        boardPane.getBoardPaneButtons()[tile.getX()][tile.getY()].addShade(playerSLCState - 1, shadeImage);
+                    } catch (IllegalArgumentException iae){
+                        System.err.println(iae.toString());
                     }
                 }
                 break;

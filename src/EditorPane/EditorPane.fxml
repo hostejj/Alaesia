@@ -6,6 +6,7 @@
 <?import EditorPane.TileListPane?>
 <?import EditorPane.ToolPane?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Font?>
 <GridPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="EditorPane.EditorController">
     <children>
         <MenuBar prefHeight="25.0" prefWidth="1024.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="0">
@@ -37,16 +38,25 @@
         </MenuBar>
         <VBox prefHeight="768.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
          <children>
-            <VBox prefHeight="200.0" prefWidth="200.0" >
+            <VBox prefHeight="150.0" prefWidth="200.0" >
             <children>
                 <Label text="Tools" />
                 <ToolPane fx:id="toolPane" />
             </children></VBox>
+            <HBox prefHeight="50.0" prefWidth="200.0" spacing="30" alignment="CENTER_LEFT" >
+                <children>
+                    <Label text="Player" >
+                        <font>
+                            <Font name="Times New Roman" size="18.0" />
+                        </font>
+                    </Label>
+                    <Button fx:id="playerSLC" />
+                </children></HBox>
             <ScrollPane prefHeight="376.0" prefWidth="200.0">
-               <content>
-                  <TileListPane fx:id="tileListPane">
-                  </TileListPane>
-               </content>
+                <content>
+                    <TileListPane fx:id="tileListPane">
+                    </TileListPane>
+                </content>
             </ScrollPane>
             <VBox prefHeight="200.0" prefWidth="200.0">
                 <children>

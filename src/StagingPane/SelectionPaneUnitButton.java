@@ -6,6 +6,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
+import java.io.File;
+
 public class SelectionPaneUnitButton extends ImageView {
 
     private SelectionPane observer;
@@ -13,14 +15,13 @@ public class SelectionPaneUnitButton extends ImageView {
 
     protected final String STYLE_NORMAL = "-fx-effect: null";
     protected final String STYLE_HOVER = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 60, 0, 0, 0)";
-    protected final String STYLE_CLICKED = "-fx-effect: innershadow(gaussian, rgba(0,0,0,0.4), 60, 0, 0, 0)";
 
     public SelectionPaneUnitButton(Unit u, SelectionPane selectionPane){
         super();
         this.unit = u;
 
         try {
-            this.setImage(new Image(u.getImageName()));
+            this.setImage(new Image(new File(u.getImageName()).toURI().toString()));
         } catch (Exception e){
             System.err.println("Could not find the unit image file. ");
         }
@@ -39,7 +40,6 @@ public class SelectionPaneUnitButton extends ImageView {
         });
         setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
-                setStyle(STYLE_CLICKED);
                 observer.updateSelectedUnit(unit);
             }
         });

@@ -21,9 +21,8 @@ public class TileListPane extends GridPane {
 
     private EditorController observer;
 
-    private final String tileListDirName = "src/Resources/TileImages/";
-    private final String listDirName = "Resources/TileImages/";
-    private final String tileDatDirName = "src/Resources/TileData/";
+    private final String tileListDirName = "Resources/TileImages/";
+    private final String tileDatDirName = "Resources/TileData/";
     private final int MAXWIDTH = 3;
     private static int columnIndex = 0;
     private static int rowIndex = 0;
@@ -78,7 +77,7 @@ public class TileListPane extends GridPane {
                     Integer mov = Integer.parseInt(movMod);
                     Integer ret = Integer.parseInt(retMod);
 
-                    Tile t = new Tile((fileName.replace(tileDatDirName, listDirName)).replace(".dat", ".png"),new Terrain(def, eva, mov, ret),-1,-1);
+                    Tile t = new Tile((fileName.replace(tileDatDirName, tileListDirName)).replace(".dat", ".png"),new Terrain(def, eva, mov, ret),-1,-1);
                     TileListPaneButton tileListPaneButton = new TileListPaneButton(t, this);
                     tiles.add(tileListPaneButton);
                 } catch (NumberFormatException nfe){
@@ -104,12 +103,16 @@ public class TileListPane extends GridPane {
             File[] directoryListing = dir.listFiles();
             for (File child : directoryListing) {
                 if(child.getName().endsWith(".png")){
-                    String tileData = (tileListDirName + child.getName()).replace(tileListDirName, tileDatDirName).replace(".png",".dat");
-                    File datFile = new File(tileData);
-                    if(datFile.isFile()){
-                        if(loadData(tileData)){
-                            tileList.add(listDirName + child.getName());
+                    try {
+                        String tileData = (tileListDirName + child.getName()).replace(tileListDirName, tileDatDirName).replace(".png", ".dat");
+                        File datFile = new File(tileData);
+                        if (datFile.isFile()) {
+                            if (loadData(tileData)) {
+                                tileList.add(tileListDirName + child.getName());
+                            }
                         }
+                    } catch (Exception e){
+                        System.err.println(e.toString());
                     }
                 }
             }

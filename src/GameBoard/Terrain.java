@@ -56,6 +56,30 @@ public class Terrain implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Terrain)) return false;
+
+        Terrain terrain = (Terrain) o;
+
+        if (!defMod.equals(terrain.defMod)) return false;
+        if (!evaMod.equals(terrain.evaMod)) return false;
+        if (!movMod.equals(terrain.movMod)) return false;
+        if (!retMod.equals(terrain.retMod)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = defMod.hashCode();
+        result = 31 * result + evaMod.hashCode();
+        result = 31 * result + movMod.hashCode();
+        result = 31 * result + retMod.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString(){
         return "def = " +  defMod + "| eva = " + evaMod + "| mov = " + movMod + "| ret = " + retMod + "\n";
     }

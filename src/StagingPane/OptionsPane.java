@@ -3,11 +3,14 @@ package StagingPane;
 import GUIs.BoardPane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+
+import java.awt.event.MouseEvent;
 
 public class OptionsPane extends GridPane {
 
@@ -26,6 +29,9 @@ public class OptionsPane extends GridPane {
 
     private final static int SLIDEMINTICK = 1;
     private final static int SLIDEMAJTICK = 5;
+
+    private final static int STARTBUTTON = 0;
+    private final static int BACKBUTTON = 1;
 
 
     private StagingController observer;
@@ -137,9 +143,23 @@ public class OptionsPane extends GridPane {
                         String.valueOf((int) turnLimitSlide.getValue()));
             }
         });
+
+        start.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            public void handle(javafx.scene.input.MouseEvent me) {
+                update(observer.START);
+            }
+        });
+
+        back.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            public void handle(javafx.scene.input.MouseEvent me) {
+                update(observer.BACK);
+            }
+        });
     }
 
     public void register(StagingController stagingController){
         this.observer = stagingController;
     }
+
+    public void update(Integer button){ observer.update(button); }
 }

@@ -16,16 +16,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.IntSummaryStatistics;
 
 public class SelectionPane extends GridPane {
 
     private StagingController observer;
     private ScrollPane selectionWindow = new ScrollPane();
 
-    private final String unitsDirName = "src/Resources/UnitImages/";
-    private final String unitsMSDirName = "Resources/UnitImages/";
-    private final String unitsDatDirName = "src/Resources/UnitData/";
+    private final String unitsDirName = "Resources/UnitImages/";
+    private final String unitsDatDirName = "Resources/UnitData/";
 
     public ArrayList<String> unitList = new ArrayList<String>();
     public ArrayList<SelectionPaneUnitButton> units = new ArrayList<SelectionPaneUnitButton>();
@@ -149,7 +147,7 @@ public class SelectionPane extends GridPane {
                     File datFile = new File(unitData);
                     if(datFile.isFile()){
                         if(loadData(unitData)){
-                            unitList.add(unitsMSDirName + child.getName());
+                            unitList.add(unitsDirName + child.getName());
                         }
                     }
                 }
@@ -236,7 +234,7 @@ public class SelectionPane extends GridPane {
 
     public void updateSelectedUnit(Unit u){
         selectedUnit = new Unit(u);
-        unitImage.setImage(new Image(selectedUnit.getImageName()));
+        unitImage.setImage(new Image(new File(selectedUnit.getImageName()).toURI().toString()));
         typeNameV.setText(u.getTypeName());
         typeValV.setText(u.getTypeVal().toString());
         charNameV.setText(u.getCharName());

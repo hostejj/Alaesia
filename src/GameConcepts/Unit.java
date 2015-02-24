@@ -1,6 +1,8 @@
 package GameConcepts;
 
 public class Unit {
+    private static String DEFAULTIMAGENAME = "Resources/UnitImages/WarriorFront.png";
+
     private String imageName;
     private String charName;
     private String typeName;
@@ -20,7 +22,7 @@ public class Unit {
     private Integer VALUE;
 
     public Unit(){
-        this.imageName = "Resources/UnitImages/WarriorFront.png";
+        this.imageName = DEFAULTIMAGENAME;
         this.charName = "John";
         this.typeName = "Warrior";
         this.typeVal = 2;
