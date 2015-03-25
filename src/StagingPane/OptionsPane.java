@@ -1,6 +1,5 @@
 package StagingPane;
 
-import GUIs.BoardPane;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -10,13 +9,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
-import java.awt.event.MouseEvent;
-
 public class OptionsPane extends GridPane {
 
-    private final static int MINPLAYERS = 2;
-    private final static int MAXPLAYERS = 4;
-    private final static int DEFPLAYERS = 2;
     private final static int MINAPOINTS = 20;
     private final static int MAXAPOINTS = 100;
     private final static int DEFAPOINTS = 30;
@@ -35,9 +29,6 @@ public class OptionsPane extends GridPane {
 
 
     private StagingController observer;
-    private Label players;
-    private Slider playersSlide;
-    private Label pSlideVal;
     private Label armyPoints;
     private Slider armyPointsSlide;
     private Label apSlideVal;
@@ -50,6 +41,7 @@ public class OptionsPane extends GridPane {
 
     private HBox buttons;
     private Button start;
+    private Button sel;
     private Button back;
 
     public OptionsPane(){
@@ -59,9 +51,6 @@ public class OptionsPane extends GridPane {
     }
 
     public void addOptionNodes(){
-        add(players, 0, 0);
-        add(playersSlide, 1, 0);
-        add(pSlideVal, 2, 0);
         add(armyPoints, 0, 1);
         add(armyPointsSlide, 1, 1);
         add(apSlideVal, 2, 1);
@@ -72,25 +61,21 @@ public class OptionsPane extends GridPane {
         add(turnLimitSlide, 1, 3);
         add(tlSlideVal, 2, 3);
 
-        buttons.getChildren().add(start);
         buttons.getChildren().add(back);
-        add(buttons, 0, 4, 4, 1);
+        buttons.getChildren().add(sel);
+        buttons.getChildren().add(start);
+        add(buttons, 0, 4, 3, 1);
     }
 
     public void initOptionNodes(){
-        players = new Label("Players");
         armyPoints = new Label("Army Points");
         turnPoints = new Label("Turn Points");
         turnLimit = new Label("Turn Limit");
         buttons = new HBox();
         start = new Button("Start Game");
-        back = new Button("Back To Menu");
+        sel = new Button("Select Map");
+        back = new Button("Back");
 
-        playersSlide = new Slider(MINPLAYERS, MAXPLAYERS, DEFPLAYERS);
-        playersSlide.setMajorTickUnit(SLIDEMINTICK);
-        playersSlide.setMinorTickCount(SLIDEMINTICK);
-        playersSlide.setSnapToTicks(true);
-        playersSlide.setMinHeight(Slider.USE_PREF_SIZE);
         armyPointsSlide = new Slider(MINAPOINTS, MAXAPOINTS, DEFAPOINTS);
         armyPointsSlide.setMajorTickUnit(SLIDEMAJTICK);
         armyPointsSlide.setMinorTickCount(SLIDEMINTICK);
@@ -107,18 +92,9 @@ public class OptionsPane extends GridPane {
         turnLimitSlide.setSnapToTicks(true);
         turnLimitSlide.setMinHeight(Slider.USE_PREF_SIZE);
 
-        pSlideVal = new Label(((Integer)((Double) playersSlide.getValue()).intValue()).toString());
         apSlideVal = new Label(((Integer)((Double) armyPointsSlide.getValue()).intValue()).toString());
         tpSlideVal = new Label(((Integer)((Double) turnPointsSlide.getValue()).intValue()).toString());
         tlSlideVal = new Label(((Integer)((Double) turnLimitSlide.getValue()).intValue()).toString());
-
-        playersSlide.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number old_val, Number new_val) {
-                pSlideVal.textProperty().setValue(
-                        String.valueOf((int) playersSlide.getValue()));
-            }
-        });
 
         armyPointsSlide.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> ov,
@@ -149,7 +125,11 @@ public class OptionsPane extends GridPane {
                 update(observer.START);
             }
         });
-
+        sel.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            public void handle(javafx.scene.input.MouseEvent me) {
+                update(observer.SEL);
+            }
+        });
         back.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
             public void handle(javafx.scene.input.MouseEvent me) {
                 update(observer.BACK);
@@ -162,4 +142,16 @@ public class OptionsPane extends GridPane {
     }
 
     public void update(Integer button){ observer.update(button); }
+
+    public Slider getArmyPointsSlide() {
+        return armyPointsSlide;
+    }
+
+    public Slider getTurnPointsSlide() {
+        return turnPointsSlide;
+    }
+
+    public Slider getTurnLimitSlide() {
+        return turnLimitSlide;
+    }
 }

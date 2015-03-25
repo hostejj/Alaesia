@@ -1,6 +1,5 @@
 package GUIs;
 
-import GUIs.TileButton;
 import GameBoard.Tile;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
@@ -8,7 +7,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import java.io.File;
-import java.util.Objects;
 
 public class BoardPaneButton extends TileButton {
 

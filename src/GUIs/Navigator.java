@@ -20,6 +20,7 @@ public class Navigator {
     public static final String MAINMENU = "MainMenu.fxml";
     public static final String PRIMARY = "PrimaryPane.fxml";
     public static final String STAGING = "../StagingPane/StagingPane.fxml";
+    public static final String SPGAME = "../SPGamePane/SPGamePane.fxml";
 
     /** The main application layout controller. */
     private static PrimaryController primaryController;

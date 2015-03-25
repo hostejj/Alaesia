@@ -4,7 +4,6 @@ import GameConcepts.Unit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * The GameMap is the bean class which houses all of the game data on units and their location. It contains

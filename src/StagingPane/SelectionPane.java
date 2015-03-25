@@ -16,23 +16,27 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SelectionPane extends GridPane {
 
     private StagingController observer;
     private ScrollPane selectionWindow = new ScrollPane();
+    private GridPane selectionGrid = new GridPane();
 
     private final String unitsDirName = "Resources/UnitImages/";
     private final String unitsDatDirName = "Resources/UnitData/";
+    private final static String NAMESLIST = "Resources/OtherData/NameList.dat";
 
-    public ArrayList<String> unitList = new ArrayList<String>();
-    public ArrayList<SelectionPaneUnitButton> units = new ArrayList<SelectionPaneUnitButton>();
+    private ArrayList<String> unitList = new ArrayList<String>();
+    private ArrayList<SelectionPaneUnitButton> units = new ArrayList<SelectionPaneUnitButton>();
+    private ArrayList<String> nameList = new ArrayList<String>();
     private final int MAXWIDTH = 1;
     private static int columnIndex = 0;
     private static int rowIndex = 0;
 
     //DataWindow vars
-    private Unit selectedUnit = new Unit();
+    private Unit selectedUnit;
     private ImageView unitImage = new ImageView();
     private Label charName = new Label("Name: ");
     private Label charNameV = new Label("");
@@ -44,6 +48,8 @@ public class SelectionPane extends GridPane {
     private Label ACCV = new Label("");
     private Label APT = new Label("Actions: ");
     private Label APTV = new Label("");
+    private Label CPA = new Label("CPA: ");
+    private Label CPAV = new Label("");
     private Label DEF = new Label("Defense: ");
     private Label DEFV = new Label("");
     private Label EVA = new Label("Evasion: ");
@@ -63,57 +69,68 @@ public class SelectionPane extends GridPane {
 
     private Button changeName = new Button("Change Name");
     private Button addUnit = new Button("Add Unit");
-    private Button removeUnit = new Button("Remove Unit");
 
     public SelectionPane(){
         super();
+        selectionWindow.setContent(selectionGrid);
         addSelectNodes();
         loadUnits();
         addUnits();
     }
 
     public void addSelectNodes(){
-        add(selectionWindow, 0, 0, 1, 9);
+        add(selectionWindow, 0, 0, 1, 10);
 
         add(typeVal, 1, 0, 2, 1);
         add(typeValV, 3, 0, 2, 1);
-        add(unitImage, 1, 1, 2, 2);
+        add(unitImage, 1, 1, 2, 3);
         add(charName, 3, 1);
         add(charNameV, 4, 1);
         add(typeName, 3, 2);
         add(typeNameV, 4, 2);
+        add(CPA,3,3);
+        add(CPAV,4,3);
 
-        add(HP, 1, 3);
-        add(HPV, 2, 3);
-        add(MP, 1, 4);
-        add(MPV, 2, 4);
-        add(APT, 1, 5);
-        add(APTV, 2, 5);
-        add(MOVE, 1, 6);
-        add(MOVEV, 2, 6);
-        add(RANGE, 1, 7);
-        add(RANGEV, 2, 7);
+        add(HP, 1, 4);
+        add(HPV, 2, 4);
+        add(MP, 1, 5);
+        add(MPV, 2, 5);
+        add(APT, 1, 6);
+        add(APTV, 2, 6);
+        add(MOVE, 1, 7);
+        add(MOVEV, 2, 7);
+        add(RANGE, 1, 8);
+        add(RANGEV, 2, 8);
 
-        add(ACC, 3, 3);
-        add(ACCV, 4, 3);
-        add(EVA, 3, 4);
-        add(EVAV, 4, 4);
-        add(STR, 3, 5);
-        add(STRV, 4, 5);
-        add(DEF, 3, 6);
-        add(DEFV, 4, 6);
-        add(RET, 3, 7);
-        add(RETV, 4, 7);
+        add(ACC, 3, 4);
+        add(ACCV, 4, 4);
+        add(EVA, 3, 5);
+        add(EVAV, 4, 5);
+        add(STR, 3, 6);
+        add(STRV, 4, 6);
+        add(DEF, 3, 7);
+        add(DEFV, 4, 7);
+        add(RET, 3, 8);
+        add(RETV, 4, 8);
 
-        add(changeName, 1, 8);
-        add(addUnit, 2, 8);
-        add(removeUnit, 3, 8);
+        add(changeName, 1, 9, 2, 1);
+        add(addUnit, 3, 9, 2, 1);
 
 
         changeName.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
-                selectedUnit.setCharName("John");
-                charNameV.setText(selectedUnit.getCharName());
+                if(selectedUnit != null) {
+                    selectedUnit.setCharName(chooseRandName());
+                    charNameV.setText(selectedUnit.getCharName());
+                }
+            }
+        });
+
+        addUnit.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+                if(selectedUnit != null) {
+                    observer.update(observer.ADD);
+                }
             }
         });
     }
@@ -127,7 +144,7 @@ public class SelectionPane extends GridPane {
                 columnIndex = 0;
                 rowIndex++;
             }
-            add(button , columnIndex++, rowIndex);
+            selectionGrid.add(button, columnIndex++, rowIndex);
         }
     }
 
@@ -179,6 +196,8 @@ public class SelectionPane extends GridPane {
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String APTS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String CPAS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String DEFS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String EVAS = peeledData.substring(0,peeledData.indexOf(';'));
@@ -198,10 +217,13 @@ public class SelectionPane extends GridPane {
                 String RETS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String STRS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String desc = peeledData.substring(0,peeledData.indexOf(';'));
                 try {
                     Integer typeCost = Integer.parseInt(typeCostS);
                     Integer acc = Integer.parseInt(ACCS);
                     Integer apt = Integer.parseInt(APTS);
+                    Integer cpa = Integer.parseInt(CPAS);
                     Integer def = Integer.parseInt(DEFS);
                     Integer eva = Integer.parseInt(EVAS);
                     Integer exp = Integer.parseInt(EXPS);
@@ -213,7 +235,8 @@ public class SelectionPane extends GridPane {
                     Integer ret = Integer.parseInt(RETS);
                     Integer str = Integer.parseInt(STRS);
 
-                    Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, def, eva, exp, hp, level, move, mp, range, ret, str);
+                    Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, cpa, def, eva, exp, hp,
+                            level, move, mp, range, ret, str, desc);
                     SelectionPaneUnitButton selectionPaneUnitButton = new SelectionPaneUnitButton(u, this);
                     units.add(selectionPaneUnitButton);
                 } catch (NumberFormatException nfe){
@@ -222,9 +245,37 @@ public class SelectionPane extends GridPane {
                 }
             }
             return true;
-        } catch (IOException ioe){
+        } catch (Exception ioe){
             System.err.println("There was an error reading the data file " + fileName);
             return false;
+        }
+    }
+
+    public String chooseRandName(){
+        if(nameList.size() == 0){
+            loadNames();
+            //safety check
+            if(nameList.size() == 0) {
+                return "John";
+            }
+        }
+        Integer index = (new Random()).nextInt(nameList.size());
+        return nameList.get(index);
+    }
+
+    public void loadNames(){
+        try{
+            String fileData = new String(Files.readAllBytes(Paths.get(NAMESLIST))).replaceAll("\r","");
+            while(fileData != ""){
+                if (fileData.indexOf("\n") < 0){
+                    break;
+                }
+                String name = (fileData.substring(0,fileData.indexOf("\n")));
+                nameList.add(name);
+                fileData = fileData.replace(name + "\n","");
+            }
+        } catch (Exception e){
+            System.err.println(e.toString());
         }
     }
 
@@ -238,6 +289,7 @@ public class SelectionPane extends GridPane {
         typeNameV.setText(u.getTypeName());
         typeValV.setText(u.getTypeVal().toString());
         charNameV.setText(u.getCharName());
+        CPAV.setText(u.getCPA().toString());
         HPV.setText(u.getHP().toString());
         MPV.setText(u.getMP().toString());
         APTV.setText(u.getAPT().toString());
@@ -248,5 +300,9 @@ public class SelectionPane extends GridPane {
         STRV.setText(u.getSTR().toString());
         DEFV.setText(u.getDEF().toString());
         RETV.setText(u.getRET().toString());
+    }
+
+    public Unit getSelectedUnit() {
+        return selectedUnit;
     }
 }

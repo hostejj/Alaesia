@@ -1,14 +1,19 @@
 package GameConcepts;
 
-public class Unit {
-    private static String DEFAULTIMAGENAME = "Resources/UnitImages/WarriorFront.png";
+import java.io.Serializable;
 
+public class Unit implements Serializable, Comparable<Unit> {
+    private static String DEFAULTIMAGENAME = "Resources/UnitImages/WarriorFront.png";
+    private static Integer DEFAULTMAXLEVEL = 4;
+
+    //Standard characteristics
     private String imageName;
     private String charName;
     private String typeName;
     private Integer typeVal;
     private Integer ACC;
     private Integer APT;
+    private Integer CPA;
     private Integer DEF;
     private Integer EVA;
     private Integer EXP;
@@ -19,7 +24,18 @@ public class Unit {
     private Integer RANGE;
     private Integer RET;
     private Integer STR;
-    private Integer VALUE;
+    private String DESC;
+
+    //Variable Characteristics
+    private Integer curHP;
+    private Integer curMP;
+    private Integer curACT;
+    private Integer curEXP;
+    private Integer curMOV;
+    private Integer curRET;
+
+    //Maximums
+    private Integer MaxLevel;
 
     public Unit(){
         this.imageName = DEFAULTIMAGENAME;
@@ -28,6 +44,7 @@ public class Unit {
         this.typeVal = 2;
         this.ACC = 85;
         this.APT = 2;
+        this.CPA = 2;
         this.DEF = 3;
         this.EVA = 10;
         this.EXP = 0;
@@ -38,17 +55,28 @@ public class Unit {
         this.RANGE = 1;
         this.RET = 1;
         this.STR = 6;
-        this.VALUE = calcVALUE();
+        this.DESC = "";
+
+        this.curHP = this.HP;
+        this.curMP = this.MP;
+        this.curACT = this.APT;
+        this.curEXP = 0;
+        this.curMOV = this.MOVE;
+        this.curRET = this.RET;
+
+        this.MaxLevel = DEFAULTMAXLEVEL;
     }
 
-    public Unit(String imageName, String charName, String typeName, Integer typeVal, Integer ACC, Integer APT, Integer DEF, Integer EVA,
-                Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP, Integer RANGE, Integer RET, Integer STR) {
+    public Unit(String imageName, String charName, String typeName, Integer typeVal, Integer ACC, Integer APT,
+                Integer CPA, Integer DEF, Integer EVA, Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP,
+                Integer RANGE, Integer RET, Integer STR, String DESC) {
         this.imageName = imageName;
         this.charName = charName;
         this.typeName = typeName;
         this.typeVal = typeVal;
         this.ACC = ACC;
         this.APT = APT;
+        this.CPA = CPA;
         this.DEF = DEF;
         this.EVA = EVA;
         this.EXP = EXP;
@@ -59,7 +87,16 @@ public class Unit {
         this.RANGE = RANGE;
         this.RET = RET;
         this.STR = STR;
-        this.VALUE = typeVal;
+        this.DESC = DESC;
+
+        this.curHP = this.HP;
+        this.curMP = this.MP;
+        this.curACT = this.APT;
+        this.curEXP = 0;
+        this.curMOV = this.MOVE;
+        this.curRET = this.RET;
+
+        this.MaxLevel = DEFAULTMAXLEVEL;
     }
 
     public Unit(Unit u) {
@@ -69,6 +106,7 @@ public class Unit {
         this.typeVal = u.typeVal;
         this.ACC = u.ACC;
         this.APT = u.APT;
+        this.CPA = u.CPA;
         this.DEF = u.DEF;
         this.EVA = u.EVA;
         this.EXP = u.EXP;
@@ -79,10 +117,20 @@ public class Unit {
         this.RANGE = u.RANGE;
         this.RET = u.RET;
         this.STR = u.STR;
-        this.VALUE = u.VALUE;
+        this.DESC = u.DESC;
+
+        this.curHP = u.HP;
+        this.curMP = u.MP;
+        this.curACT = u.APT;
+        this.curEXP = u.EXP;
+        this.curMOV = u.MOVE;
+        this.curRET = u.RET;
+
+        this.MaxLevel = u.MaxLevel;
     }
 
     public String getImageName() {
+
         return imageName;
     }
 
@@ -128,6 +176,14 @@ public class Unit {
 
     public void setAPT(Integer APT) {
         this.APT = APT;
+    }
+
+    public Integer getCPA() {
+        return CPA;
+    }
+
+    public void setCPA(Integer CPA) {
+        this.CPA = CPA;
     }
 
     public Integer getDEF() {
@@ -210,16 +266,140 @@ public class Unit {
         this.STR = STR;
     }
 
-    public Integer calcVALUE(){
-        //calculate current worth of the unit
-        return 5;
+    public String getDESC() {
+        return DESC;
     }
 
-    public Integer getVALUE() {
-        return VALUE;
+    public void setDESC(String DESC) {
+        this.DESC = DESC;
     }
 
-    public void setVALUE(Integer VALUE) {
-        this.VALUE = VALUE;
+    public Integer getCurHP() {
+        return curHP;
+    }
+
+    public void setCurHP(Integer curHP) {
+        this.curHP = curHP;
+    }
+
+    public Integer getCurMP() {
+        return curMP;
+    }
+
+    public void setCurMP(Integer curMP) {
+        this.curMP = curMP;
+    }
+
+    public Integer getCurACT() {
+        return curACT;
+    }
+
+    public void setCurACT(Integer curACT) {
+        this.curACT = curACT;
+    }
+
+    public Integer getCurEXP() {
+        return curEXP;
+    }
+
+    public void setCurEXP(Integer curEXP) {
+        this.curEXP = curEXP;
+    }
+
+    public Integer getCurMOV() {
+        return curMOV;
+    }
+
+    public void setCurMOV(Integer curMOV) {
+        this.curMOV = curMOV;
+    }
+
+    public Integer getCurRET() {
+        return curRET;
+    }
+
+    public void setCurRET(Integer curRET) {
+        this.curRET = curRET;
+    }
+
+    public Integer getMaxLevel() {
+        return MaxLevel;
+    }
+
+    public void setMaxLevel(Integer maxLevel) {
+        MaxLevel = maxLevel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Unit)) return false;
+
+        Unit unit = (Unit) o;
+
+        if (!ACC.equals(unit.ACC)) return false;
+        if (!APT.equals(unit.APT)) return false;
+        if (!CPA.equals(unit.CPA)) return false;
+        if (!DEF.equals(unit.DEF)) return false;
+        if (!DESC.equals(unit.DESC)) return false;
+        if (!EVA.equals(unit.EVA)) return false;
+        if (!EXP.equals(unit.EXP)) return false;
+        if (!HP.equals(unit.HP)) return false;
+        if (!LEVEL.equals(unit.LEVEL)) return false;
+        if (!MOVE.equals(unit.MOVE)) return false;
+        if (!MP.equals(unit.MP)) return false;
+        if (!MaxLevel.equals(unit.MaxLevel)) return false;
+        if (!RANGE.equals(unit.RANGE)) return false;
+        if (!RET.equals(unit.RET)) return false;
+        if (!STR.equals(unit.STR)) return false;
+        if (!charName.equals(unit.charName)) return false;
+        if (!curACT.equals(unit.curACT)) return false;
+        if (!curEXP.equals(unit.curEXP)) return false;
+        if (!curHP.equals(unit.curHP)) return false;
+        if (!curMOV.equals(unit.curMOV)) return false;
+        if (!curMP.equals(unit.curMP)) return false;
+        if (!curRET.equals(unit.curRET)) return false;
+        if (!imageName.equals(unit.imageName)) return false;
+        if (!typeName.equals(unit.typeName)) return false;
+        if (!typeVal.equals(unit.typeVal)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = imageName.hashCode();
+        result = 31 * result + charName.hashCode();
+        result = 31 * result + typeName.hashCode();
+        result = 31 * result + typeVal.hashCode();
+        result = 31 * result + ACC.hashCode();
+        result = 31 * result + APT.hashCode();
+        result = 31 * result + CPA.hashCode();
+        result = 31 * result + DEF.hashCode();
+        result = 31 * result + EVA.hashCode();
+        result = 31 * result + EXP.hashCode();
+        result = 31 * result + HP.hashCode();
+        result = 31 * result + LEVEL.hashCode();
+        result = 31 * result + MOVE.hashCode();
+        result = 31 * result + MP.hashCode();
+        result = 31 * result + RANGE.hashCode();
+        result = 31 * result + RET.hashCode();
+        result = 31 * result + STR.hashCode();
+        result = 31 * result + DESC.hashCode();
+        result = 31 * result + curHP.hashCode();
+        result = 31 * result + curMP.hashCode();
+        result = 31 * result + curACT.hashCode();
+        result = 31 * result + curEXP.hashCode();
+        result = 31 * result + curMOV.hashCode();
+        result = 31 * result + curRET.hashCode();
+        result = 31 * result + MaxLevel.hashCode();
+        return result;
+    }
+
+    @Override
+    public int compareTo(Unit o) {
+        String curString = this.getTypeName() + this.getCharName();
+        String oString = o.getTypeName() + o.getCharName();
+        return curString.compareTo(oString);
     }
 }

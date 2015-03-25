@@ -138,7 +138,6 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
                 editorTab.getTabs().add(new Tab(mapFile.getName()));
                 openMaps.add(gameMap);
-                System.err.println(openMaps.size());
                 renderMap(openMaps.size() - 1);
             }
         } catch (ClassNotFoundException cnfe){
@@ -167,7 +166,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
             if(t.isSelected()){
                 try{
                     File mapFile = new File(t.getText());
-                    FileOutputStream fileOut = new FileOutputStream(mapFile);
+                    FileOutputStream fileOut = new FileOutputStream("Resources/Maps/" + mapFile);
                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
                     out.writeObject(((BoardPane) ((ScrollPane) t.getContent()).getContent()).getGameMap());
@@ -235,6 +234,18 @@ public class EditorController implements Initializable, BoardPaneObserver {
         BoardPane boardPane = new BoardPane(openMaps.get(index), this);
         scrollPane.setContent(boardPane);
         current.setContent(scrollPane);
+        for(int i = 0; i < boardPane.getGameMap().getMaxPlayers(); i++) {
+            for (Tile sltile : boardPane.getGameMap().getStartLocs().get(i)){
+                //add color the tile on the editor
+                try {
+                    String shadeName = SLSTRING + ((Integer) (i + 1)).toString() + ".png";
+                    ImageView shadeImage = new ImageView(new Image(new File(shadeName).toURI().toString()));
+                    boardPane.getBoardPaneButtons()[sltile.getX()][sltile.getY()].addShade(i, shadeImage);
+                } catch (IllegalArgumentException iae){
+                    System.err.println(iae.toString());
+                }
+            }
+        }
     }
 
     public void updateCurrentTile(Tile tile){

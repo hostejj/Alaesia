@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.MenuBar?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<GridPane fx:id="topGrid" prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="SPGamePane.SPGamePaneController">
+    <children>
+        <MenuBar prefHeight="25.0" prefWidth="1024.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="0">
+            <menus>
+                <Menu text="Menu">
+                    <items>
+                        <MenuItem onAction="#handleExitToMain" text="Exit To Main Menu" />
+                        <MenuItem onAction="#handleExitAlaesia" text="Exit Alaesia" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <ScrollPane fx:id="boardWrap" prefHeight="768.0" prefWidth="824.0" GridPane.columnIndex="0" GridPane.rowSpan="2147483647" GridPane.rowIndex="1">
+        </ScrollPane>
+        <VBox fx:id="sideBar" prefHeight="768.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
+            <children>
+            </children>
+        </VBox>
+    </children>
+</GridPane>
