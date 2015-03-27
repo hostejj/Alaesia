@@ -19,7 +19,7 @@ public class Game implements Serializable {
     private boolean errorFlag = false;
 
     public static enum GameState {
-        PLACEMENTPHASE, BATTLE, GAMEOVER
+        PLACEMENTPHASE, BATTLE, UNITMOVE, GAMEOVER
     }
 
     private transient ReadOnlyObjectWrapper<Player> currentPlayer;
@@ -103,6 +103,9 @@ public class Game implements Serializable {
     public GameState getGameState() {
         return gameState.get();
     }
+    public void setGameState(GameState gameState) {
+        this.gameState.set(gameState);
+    }
 
     /**
      * During the unit placement phase of the game, place the selected unit(if it is owned by the current
@@ -167,41 +170,85 @@ public class Game implements Serializable {
         if(checkPlacementPhaseOver()) { //determine if the placement phase has ended
             gameState.set(GameState.BATTLE);
         }
-        nextPlayer();
     }
 
     public ArrayList<MapCell> actionableMCs(Unit unit){
         ArrayList<MapCell> legitMCs = new ArrayList<MapCell>();
-        ArrayList<MapCell> checkedMCs = new ArrayList<MapCell>();
-        ArrayList<MapCell> neighbors;
+        ArrayList<MapCell> currentList = new ArrayList<MapCell>();
 
         MapCell unitLocation = gameMap.locateUnit(unit);
-        checkedMCs.add(unitLocation); // add the base location to the list of checked cells
-
-        //need to track movement
-        Integer movementLeft = unit.getCurMOV();
 
         if(unitLocation != null){
-            neighbors = gameMap.getNeighboringCells(unitLocation, 2);
-            for(MapCell mapCell : neighbors){
-                if(!checkedMCs.contains(mapCell)){
-                    if(mapCell.getUnit() != null){ // it costs one movement to attack
-                        if(movementLeft >= 1) {
-                            legitMCs.add(mapCell);
-                            checkedMCs.add(mapCell);
-                        }
-                    } else { //the cell does not contain a unit
-                        if(movementLeft > (1 - mapCell.getTile().getTerrain().getMovMod())) { // has enough movement
-                            legitMCs.add(mapCell);
-                            checkedMCs.add(mapCell);
+            currentList.add(unitLocation); // add the base location to the list of checked cells
+            //need to track movement
+            Integer movementLeft = unit.getCurMOV();
 
+            actionRecurseHelper(unitLocation, unit, movementLeft, legitMCs);
+        }
+
+        return legitMCs;
+    }
+
+    private void actionRecurseHelper(MapCell mapCell, Unit unit, Integer movementLeft, ArrayList<MapCell> legitMCs){
+        ArrayList<MapCell> neighbors;
+
+        if(movementLeft == 0){
+            //dead end
+        } else if ( movementLeft == 1){
+            //actionable tiles are neighbors that can be moved too
+            neighbors = gameMap.getNeighboringCells(mapCell, 1);
+            for(MapCell tmpMC: neighbors){
+                if(tmpMC.getTile().getTerrain().getMovMod() <= 0){
+                    if(tmpMC.getUnit() == null) {
+                        if (!legitMCs.contains(tmpMC)) {
+                            legitMCs.add(tmpMC);
+                        }
+                    }
+                }
+            }
+
+            //actionable tiles are also tiles within range of an attack
+            for(int i = unit.getMinRANGE(); i <= unit.getMaxRANGE(); i++){
+                neighbors = gameMap.getNeighboringCells(mapCell, i);
+                for(MapCell tmpMC: neighbors){
+                    if(tmpMC.getUnit() != null){
+                        if(findOwner(unit) != findOwner(tmpMC.getUnit())) {
+                            if (!legitMCs.contains(tmpMC)) {
+                                legitMCs.add(tmpMC);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ( movementLeft > 1){
+            neighbors = gameMap.getNeighboringCells(mapCell, 1);
+            //recurse on each reachable tile // otherwise evaluate attack range
+            for(MapCell tmpMC: neighbors){
+                if(movementLeft >= (1 + tmpMC.getTile().getTerrain().getMovMod())){
+                    if(tmpMC.getUnit()==null) {
+                        Integer newMovement = movementLeft - (1 + tmpMC.getTile().getTerrain().getMovMod());
+                        if (!legitMCs.contains(tmpMC)) {
+                            legitMCs.add(tmpMC);
+                        }
+                        actionRecurseHelper(tmpMC,unit,newMovement,legitMCs);
+                    }
+                }
+            }
+            ArrayList<MapCell> tmpNeighs;
+            //actionable tiles are also tiles within range of an attack
+            for(int i = unit.getMinRANGE(); i <= unit.getMaxRANGE(); i++){
+                tmpNeighs = gameMap.getNeighboringCells(mapCell, i);
+                for(MapCell tmpMCa: tmpNeighs){
+                    if(tmpMCa.getUnit() != null){
+                        if(findOwner(unit) != findOwner(tmpMCa.getUnit())) {
+                            if (!legitMCs.contains(tmpMCa)) {
+                                legitMCs.add(tmpMCa);
+                            }
                         }
                     }
                 }
             }
         }
-
-        return legitMCs;
     }
 
     public boolean checkPlacementPhaseOver(){

@@ -21,7 +21,8 @@ public class Unit implements Serializable, Comparable<Unit> {
     private Integer LEVEL;
     private Integer MOVE;
     private Integer MP;
-    private Integer RANGE;
+    private Integer minRANGE;
+    private Integer maxRANGE;
     private Integer RET;
     private Integer STR;
     private String DESC;
@@ -52,7 +53,8 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.LEVEL = 1;
         this.MOVE = 5;
         this.MP = 0;
-        this.RANGE = 1;
+        this.minRANGE = 1;
+        this.maxRANGE = 1;
         this.RET = 1;
         this.STR = 6;
         this.DESC = "";
@@ -69,7 +71,7 @@ public class Unit implements Serializable, Comparable<Unit> {
 
     public Unit(String imageName, String charName, String typeName, Integer typeVal, Integer ACC, Integer APT,
                 Integer CPA, Integer DEF, Integer EVA, Integer EXP, Integer HP, Integer LEVEL, Integer MOVE, Integer MP,
-                Integer RANGE, Integer RET, Integer STR, String DESC) {
+                Integer minRANGE, Integer maxRANGE, Integer RET, Integer STR, String DESC) {
         this.imageName = imageName;
         this.charName = charName;
         this.typeName = typeName;
@@ -84,7 +86,8 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.LEVEL = LEVEL;
         this.MOVE = MOVE;
         this.MP = MP;
-        this.RANGE = RANGE;
+        this.minRANGE = minRANGE;
+        this.maxRANGE = maxRANGE;
         this.RET = RET;
         this.STR = STR;
         this.DESC = DESC;
@@ -114,7 +117,8 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.LEVEL = u.LEVEL;
         this.MOVE = u.MOVE;
         this.MP = u.MP;
-        this.RANGE = u.RANGE;
+        this.minRANGE = u.minRANGE;
+        this.maxRANGE = u.maxRANGE;
         this.RET = u.RET;
         this.STR = u.STR;
         this.DESC = u.DESC;
@@ -242,12 +246,20 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.MP = MP;
     }
 
-    public Integer getRANGE() {
-        return RANGE;
+    public Integer getMaxRANGE() {
+        return maxRANGE;
     }
 
-    public void setRANGE(Integer RANGE) {
-        this.RANGE = RANGE;
+    public void setMaxRANGE(Integer maxRANGE) {
+        this.maxRANGE = maxRANGE;
+    }
+
+    public Integer getMinRANGE() {
+        return minRANGE;
+    }
+
+    public void setMinRANGE(Integer minRANGE) {
+        this.minRANGE = minRANGE;
     }
 
     public Integer getRET() {
@@ -349,7 +361,8 @@ public class Unit implements Serializable, Comparable<Unit> {
         if (!MOVE.equals(unit.MOVE)) return false;
         if (!MP.equals(unit.MP)) return false;
         if (!MaxLevel.equals(unit.MaxLevel)) return false;
-        if (!RANGE.equals(unit.RANGE)) return false;
+        if (!minRANGE.equals(unit.minRANGE)) return false;
+        if (!maxRANGE.equals(unit.maxRANGE)) return false;
         if (!RET.equals(unit.RET)) return false;
         if (!STR.equals(unit.STR)) return false;
         if (!charName.equals(unit.charName)) return false;
@@ -382,7 +395,8 @@ public class Unit implements Serializable, Comparable<Unit> {
         result = 31 * result + LEVEL.hashCode();
         result = 31 * result + MOVE.hashCode();
         result = 31 * result + MP.hashCode();
-        result = 31 * result + RANGE.hashCode();
+        result = 31 * result + minRANGE.hashCode();
+        result = 31 * result + maxRANGE.hashCode();
         result = 31 * result + RET.hashCode();
         result = 31 * result + STR.hashCode();
         result = 31 * result + DESC.hashCode();

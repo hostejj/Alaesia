@@ -41,15 +41,19 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     private BoardPaneButton selectedBoardPaneButton;
     private final String SHADENAME = "Resources/InterfaceImages/pshade";
     private SPGamePaneController self = this;
+    private Unit unitToUse;
 
     @FXML private ScrollPane boardWrap;
     @FXML private VBox sideBar;
 
     public static final int PASS = 0;
-    public static final int END = 1;
-    public static final int SELECTED = 2;
-    public static final int BOARDSEL = 3;
-    public static final int PLACE = 4;
+    public static final int SELECTED = 1;
+    public static final int BOARDSEL = 2;
+    public static final int PLACE = 3;
+    public static final int USE = 4;
+    public static final int MOVE = 5;
+    public static final int ATTACK = 6;
+    public static final int END = 7;
 
     private HintBox hintBox;
     private SelectedPane selectedPane;
@@ -79,13 +83,13 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     public void loadGameData(){
         try{
             File temp = new File("Resources/startTemp.gam");
-                FileInputStream fileIn = new FileInputStream(temp);
-                ObjectInputStream in = new ObjectInputStream(fileIn);
-                game = (Game) in.readObject();
-                in.close();
-                fileIn.close();
+            FileInputStream fileIn = new FileInputStream(temp);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            game = (Game) in.readObject();
+            in.close();
+            fileIn.close();
 
-                game.setPropertiesOnLoad();
+            game.setPropertiesOnLoad();
         } catch (ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         } catch (IOException ioe){
@@ -112,24 +116,10 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
         }
     }
 
-    public void rmSLShades(){
-        for(int i = 0; i < game.getGameMap().getStartLocs().size(); i++){
-            for(MapCell mc: game.getGameMap().getStartLocs().get(i)){
-                try{
-                    boardPane.getBoardPaneButtons()[mc.getTile().getX()][mc.getTile().getY()].removeShade(i);
-                } catch (Exception e){
-                    System.err.println(e.toString());
-                }
-            }
-        }
-    }
-
     public void update(int choice){
         switch (choice){
             case PASS:
                 game.nextPlayer();
-                break;
-            case END:
                 break;
             case SELECTED:
                 for(Tab tab: playerStatusPane.getTabs()){
@@ -154,6 +144,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 } else {
                     selectedPane.updateSelected(selectedBoardPaneButton.getTile(), selectedBoardPaneButton.getUnit(),
                             null);
+                    clearHighlights();
                 }
                 break;
             case PLACE:
@@ -164,6 +155,28 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 } else {
                     selectedBoardPaneButton.getUnitImage().setImage(new Image(
                             new File(selectedBoardPaneButton.getUnit().getImageName()).toURI().toString()));
+                    game.nextPlayer();
+                }
+                break;
+            case USE:
+                if(unitToUse != null){
+                    if(game.getCurrentPlayer().getArmy().contains(unitToUse)){
+                        if((game.getCurrentPlayer().getTurnPoints() >= unitToUse.getCPA()) && (unitToUse.getCurACT() > 0)) {
+                            game.getCurrentPlayer().setTurnPoints(game.getCurrentPlayer().getTurnPoints() - unitToUse.getCPA());
+                            game.getCurrentPlayer().setUnitInUse(unitToUse);
+                            game.setGameState(Game.GameState.UNITMOVE);
+                        }
+                    }
+                }
+                break;
+            case MOVE:
+                break;
+            case ATTACK:
+                break;
+            case END:
+                if(game.getCurrentPlayer().getUnitInUse() != null){
+                    game.getCurrentPlayer().setUnitInUse(null);
+                    game.setGameState(Game.GameState.BATTLE);
                 }
                 break;
             default:
@@ -197,6 +210,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
             update(BOARDSEL);
         } else if (click == boardPaneButton.RIGHTCLICK){
             selectedBoardPaneButton = boardPaneButton;
+            unitToUse = selectedBoardPaneButton.getUnit();
             BoardContextMenu contextMenu = new BoardContextMenu(this);
             contextMenu.show(boardPaneButton, Side.RIGHT, 0, 20);
         }
@@ -242,8 +256,8 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                         Player player = game.getCurrentPlayer();
                         if(game.getCurrentPlayer().makeMove().placeUnit(game)){
                             displayPlaceUnit(player);
-                        } else { game.nextPlayer(); }
-
+                        }
+                        game.nextPlayer();
                     }
                     else if(game.getGameState() == Game.GameState.BATTLE){
                         game.nextPlayer();
@@ -282,10 +296,11 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
 
                 } else if (game.getGameState() == Game.GameState.BATTLE) {
                     hintBox.setHint("Battle Phase: Select a unit to see its available movement. Units can be selected" +
-                            "via the player tabs or the map. Right click-the map to bring up a list of choices for the " +
-                            "selected unit.");
-                    rmSLShades();
-
+                            "via the player tabs or the map. Right click-the map and the use button to select the unit" +
+                            "for use");
+                    clearHighlights();
+                } else if (game.getGameState() == Game.GameState.UNITMOVE) {
+                    hintBox.setHint("Moving Unit: Right click on a highlighted tile and select a choice for the unit.");
                 } else if (game.getGameState() == Game.GameState.GAMEOVER) {
 
                 }
@@ -309,7 +324,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
 
     public void highlightAvailable(Unit u){
         if(u != null){
-            if(game.getGameState() == Game.GameState.BATTLE){
+            if(game.getGameState() != Game.GameState.PLACEMENTPHASE){
                 Integer pindex = game.getPlayerIndex(game.findOwner(u));
                 clearHighlights();
                 ArrayList<MapCell> actionableMCs = game.actionableMCs(u);
@@ -328,9 +343,11 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     }
 
     public void clearHighlights(){
-        for(BoardPaneButton[] bpba: boardPane.getBoardPaneButtons()){
-            for(BoardPaneButton bpb: bpba){
-                bpb.removeAllShades();
+        if(game.getGameState() != Game.GameState.PLACEMENTPHASE){
+            for(BoardPaneButton[] bpba: boardPane.getBoardPaneButtons()){
+                for(BoardPaneButton bpb: bpba){
+                    bpb.removeAllShades();
+                }
             }
         }
     }

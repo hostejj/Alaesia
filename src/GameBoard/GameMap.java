@@ -204,36 +204,81 @@ public class GameMap implements Serializable {
         return null;
     }
 
-    public ArrayList<MapCell> getNeighboringCells(MapCell mc, Integer radius){
+    public ArrayList<MapCell> getNeighboringCells(MapCell mc, Integer iterations){
+        ArrayList<MapCell> intermediary = new ArrayList<MapCell>();
+        ArrayList<MapCell> temp = new ArrayList<MapCell>(); // so no concurrent modification exception
         ArrayList<MapCell> neighbors = new ArrayList<MapCell>();
-        Integer cx = mc.getTile().getX();
-        Integer cy = mc.getTile().getY();
+        intermediary.add(mc);
+        Integer radius = 1;
 
-        for(int y = cy - radius; y <= cy + radius; y++) {
-            for (int x = cx - radius; x <= cx + radius; x++) {
-                if((x>=0) && (y>=0) && (x < width) && (y < height) && (!((x==cx) && (y==cy)))) {
-                    if (cx % 2 == 1) {
-                        if(x % 2 ==1){
-                            if((y >= cy - radius) && (y <= (cy + radius))){
-                                neighbors.add(mapCells[x][y]);
-                            }
-                        } else {
-                            if((y > cy - radius) && (y <= (cy + radius))){
-                                neighbors.add(mapCells[x][y]);
-                            }
-                        }
-                    } else {
-                        if(x % 2 == 1){
-                            if((y >= cy - radius) && (y < (cy + radius))){
-                                neighbors.add(mapCells[x][y]);
-                            }
-                        } else {
-                            if((y >= (cy - radius)) && (y <= (cy + radius))){
-                                neighbors.add(mapCells[x][y]);
+        for (int i = 1; i <= iterations; i++) {
+            for(MapCell mapCell: intermediary) {
+                Integer cx = mapCell.getTile().getX();
+                Integer cy = mapCell.getTile().getY();
+
+                //finds neighbors one square out
+                for (int y = cy - radius; y <= cy + radius; y++) {
+                    for (int x = cx - radius; x <= cx + radius; x++) {
+                        if ((x >= 0) && (y >= 0) && (x < width) && (y < height) && (!((x == cx) && (y == cy)))) {
+                            if (cx % 2 == 1) {
+                                if (x % 2 == 1) {
+                                    if ((y >= cy - radius) && (y <= (cy + radius))) {
+                                        if(i == iterations){
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                neighbors.add(mapCells[x][y]);
+                                            }
+                                        } else {
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                temp.add(mapCells[x][y]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if ((y > cy - radius) && (y <= (cy + radius))) {
+                                        if(i == iterations){
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                neighbors.add(mapCells[x][y]);
+                                            }
+                                        } else {
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                temp.add(mapCells[x][y]);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (x % 2 == 1) {
+                                    if ((y >= cy - radius) && (y < (cy + radius))) {
+                                        if(i == iterations){
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                neighbors.add(mapCells[x][y]);
+                                            }
+                                        } else {
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                temp.add(mapCells[x][y]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if ((y >= (cy - radius)) && (y <= (cy + radius))) {
+                                        if(i == iterations){
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                neighbors.add(mapCells[x][y]);
+                                            }
+                                        } else {
+                                            if(!intermediary.contains(mapCells[x][y])){
+                                                temp.add(mapCells[x][y]);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+            }
+            for(MapCell tmc: temp){
+                intermediary.add(tmc);
             }
         }
 

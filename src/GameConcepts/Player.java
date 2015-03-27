@@ -11,6 +11,7 @@ public class Player implements Serializable{
     private Integer turnPoints;
     private boolean human;
     private AIDecisions aiDecisions;
+    private Unit unitInUse;
 
     public Player() {
         playerName = DEFAULTPLAYERNAME;
@@ -18,6 +19,7 @@ public class Player implements Serializable{
         turnPoints = 0;
         human = true;
         aiDecisions = new AIDecisions(this);
+        unitInUse = null;
     }
 
     public ArrayList<Unit> getArmy() {
@@ -40,6 +42,10 @@ public class Player implements Serializable{
         return turnPoints;
     }
 
+    public void setTurnPoints(Integer turnPoints) {
+        this.turnPoints = turnPoints;
+    }
+
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
@@ -50,6 +56,14 @@ public class Player implements Serializable{
 
     public void setHuman(boolean human) {
         this.human = human;
+    }
+
+    public Unit getUnitInUse() {
+        return unitInUse;
+    }
+
+    public void setUnitInUse(Unit unitInUse) {
+        this.unitInUse = unitInUse;
     }
 
     public AIDecisions makeMove(){

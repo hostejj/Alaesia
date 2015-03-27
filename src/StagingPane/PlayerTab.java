@@ -181,7 +181,7 @@ public class PlayerTab extends Tab {
         MPV.setText(selectedUnit.getMP().toString());
         APTV.setText(selectedUnit.getAPT().toString());
         MOVEV.setText(selectedUnit.getMOVE().toString());
-        RANGEV.setText(selectedUnit.getRANGE().toString());
+        RANGEV.setText(selectedUnit.getMinRANGE() + "-" + selectedUnit.getMaxRANGE());
         ACCV.setText(selectedUnit.getACC().toString());
         EVAV.setText(selectedUnit.getEVA().toString());
         STRV.setText(selectedUnit.getSTR().toString());

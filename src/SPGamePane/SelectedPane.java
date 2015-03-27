@@ -154,7 +154,7 @@ public class SelectedPane extends GridPane {
             HPV.setText(selectedUnit.getCurHP() + "/" + selectedUnit.getHP());
             MOVEV.setText(selectedUnit.getCurMOV() + "/" + selectedUnit.getMOVE());
             MPV.setText(selectedUnit.getCurMP() + "/" + selectedUnit.getMP());
-            RANGEV.setText(selectedUnit.getRANGE().toString());
+            RANGEV.setText(selectedUnit.getMinRANGE().toString() + "-" + selectedUnit.getMaxRANGE());
             RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET() + " (" + (selectedUnit.getRET() + selectedTile.getTerrain().getRetMod()) + ")");
             STRV.setText(selectedUnit.getSTR().toString());
             EXPV.setText(selectedUnit.getCurEXP() + "/" + selectedUnit.getEXP());
@@ -224,7 +224,7 @@ public class SelectedPane extends GridPane {
             HPV.setText(selectedUnit.getCurHP() + "/" + selectedUnit.getHP());
             MOVEV.setText(selectedUnit.getCurMOV() + "/" + selectedUnit.getMOVE());
             MPV.setText(selectedUnit.getCurMP() + "/" + selectedUnit.getMP());
-            RANGEV.setText(selectedUnit.getRANGE().toString());
+            RANGEV.setText(selectedUnit.getMinRANGE().toString() + "-" + selectedUnit.getMaxRANGE());
             RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET());
             STRV.setText(selectedUnit.getSTR().toString());
             EXPV.setText(selectedUnit.getCurEXP() + "/" + selectedUnit.getEXP());

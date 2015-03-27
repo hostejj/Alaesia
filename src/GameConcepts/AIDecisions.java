@@ -42,7 +42,9 @@ public class AIDecisions implements Serializable{
         Integer pindex = game.getPlayerIndex(owner);
         while (!pickedTile){
             Integer rand = random.nextInt(game.getGameMap().getStartLocs().get(pindex).size());
-            if(game.getGameMap().getStartLocs().get(pindex).get(rand).getUnit() == null){
+            Integer slx = game.getGameMap().getStartLocs().get(pindex).get(rand).getTile().getX();
+            Integer sly = game.getGameMap().getStartLocs().get(pindex).get(rand).getTile().getY();
+            if(game.getGameMap().getMapCells()[slx][sly].getUnit() == null){
                 neededTile = game.getGameMap().getStartLocs().get(pindex).get(rand).getTile();
                 pickedTile = true;
             }

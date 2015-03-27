@@ -32,8 +32,8 @@ public class SelectionPane extends GridPane {
     private ArrayList<SelectionPaneUnitButton> units = new ArrayList<SelectionPaneUnitButton>();
     private ArrayList<String> nameList = new ArrayList<String>();
     private final int MAXWIDTH = 1;
-    private static int columnIndex = 0;
-    private static int rowIndex = 0;
+    private int columnIndex = 0;
+    private int rowIndex = 0;
 
     //DataWindow vars
     private Unit selectedUnit;
@@ -214,7 +214,9 @@ public class SelectionPane extends GridPane {
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String MPS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
-                String RANGES = peeledData.substring(0,peeledData.indexOf(';'));
+                String nRANGES = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String xRANGES = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String RETS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
@@ -233,12 +235,13 @@ public class SelectionPane extends GridPane {
                     Integer level = Integer.parseInt(LEVELS);
                     Integer move = Integer.parseInt(MOVES);
                     Integer mp = Integer.parseInt(MPS);
-                    Integer range = Integer.parseInt(RANGES);
+                    Integer nRange = Integer.parseInt(nRANGES);
+                    Integer xRange = Integer.parseInt(xRANGES);
                     Integer ret = Integer.parseInt(RETS);
                     Integer str = Integer.parseInt(STRS);
 
                     Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, cpa, def, eva, exp, hp,
-                            level, move, mp, range, ret, str, desc);
+                            level, move, mp, nRange, xRange, ret, str, desc);
                     SelectionPaneUnitButton selectionPaneUnitButton = new SelectionPaneUnitButton(u, this);
                     units.add(selectionPaneUnitButton);
                 } catch (NumberFormatException nfe){
@@ -296,7 +299,7 @@ public class SelectionPane extends GridPane {
         MPV.setText(u.getMP().toString());
         APTV.setText(u.getAPT().toString());
         MOVEV.setText(u.getMOVE().toString());
-        RANGEV.setText(u.getRANGE().toString());
+        RANGEV.setText(u.getMinRANGE().toString() + "-" + u.getMaxRANGE().toString());
         ACCV.setText(u.getACC().toString());
         EVAV.setText(u.getEVA().toString());
         STRV.setText(u.getSTR().toString());
