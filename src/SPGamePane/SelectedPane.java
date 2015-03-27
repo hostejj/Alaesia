@@ -57,6 +57,11 @@ public class SelectedPane extends GridPane {
     private Label STR = new Label("STR: ");
     private Label STRV = new Label("");
 
+    private Label LVL = new Label("LVL: ");
+    private Label LVLV = new Label("");
+    private Label EXP = new Label("EXP: ");
+    private Label EXPV = new Label("");
+
     //Player Vars
     private Player owningPlayer;
     private Label ownerL = new Label("Army: ");
@@ -79,8 +84,8 @@ public class SelectedPane extends GridPane {
 
         //Unit Info
         this.add(unitL,0,7,2,1);
-        this.add(charName,2,7);
-        this.add(charNameV,3,7);
+        this.add(charName,0,10);
+        this.add(charNameV,1,10);
         this.add(unitImage,0,8,4,2);
         this.add(typeName,2,10);
         this.add(typeNameV,3,10);
@@ -92,8 +97,8 @@ public class SelectedPane extends GridPane {
         this.add(APTV,1,13);
         this.add(MOVE,0,14);
         this.add(MOVEV,1,14);
-        this.add(RANGE,0,15);
-        this.add(RANGEV,1,15);
+        this.add(RET,0,15);
+        this.add(RETV,1,15);
         this.add(ACC,2,11);
         this.add(ACCV,3,11);
         this.add(EVA,2,12);
@@ -102,13 +107,19 @@ public class SelectedPane extends GridPane {
         this.add(STRV,3,13);
         this.add(DEF,2,14);
         this.add(DEFV,3,14);
-        this.add(RET,2,15);
-        this.add(RETV,3,15);
+        this.add(RANGE,2,15);
+        this.add(RANGEV,3,15);
 
         this.add(CPA,0,16);
         this.add(CPAV,1,16);
         this.add(ownerL,2,16);
         this.add(owner,3,16);
+
+        this.add(LVL,0,17);
+        this.add(LVLV,1,17);
+        this.add(EXP,2,17);
+        this.add(EXPV,3,17);
+
     }
 
     public void updateSelected(Tile tile, Unit unit, Player player){
@@ -138,14 +149,16 @@ public class SelectedPane extends GridPane {
             ACCV.setText(selectedUnit.getACC().toString());
             APTV.setText(selectedUnit.getCurACT() + "/" + selectedUnit.getAPT());
             CPAV.setText(selectedUnit.getCPA().toString());
-            DEFV.setText(selectedUnit.getDEF() + " (" + selectedUnit.getDEF() + selectedTile.getTerrain().getDefMod() + ")");
-            EVAV.setText(selectedUnit.getEVA() + " (" + selectedUnit.getEVA() + selectedTile.getTerrain().getEvaMod() + ")");
+            DEFV.setText(selectedUnit.getDEF() + " (" + (selectedUnit.getDEF() + selectedTile.getTerrain().getDefMod()) + ")");
+            EVAV.setText(selectedUnit.getEVA() + " (" + (selectedUnit.getEVA() + selectedTile.getTerrain().getEvaMod()) + ")");
             HPV.setText(selectedUnit.getCurHP() + "/" + selectedUnit.getHP());
             MOVEV.setText(selectedUnit.getCurMOV() + "/" + selectedUnit.getMOVE());
             MPV.setText(selectedUnit.getCurMP() + "/" + selectedUnit.getMP());
             RANGEV.setText(selectedUnit.getRANGE().toString());
-            RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET() + " (" + selectedUnit.getRET() + selectedTile.getTerrain().getRetMod() + ")");
+            RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET() + " (" + (selectedUnit.getRET() + selectedTile.getTerrain().getRetMod()) + ")");
             STRV.setText(selectedUnit.getSTR().toString());
+            EXPV.setText(selectedUnit.getCurEXP() + "/" + selectedUnit.getEXP());
+            LVLV.setText(selectedUnit.getLEVEL() + "/" + selectedUnit.getMaxLevel());
 
             owner.setText(owningPlayer.getPlayerName());
         }
@@ -179,6 +192,8 @@ public class SelectedPane extends GridPane {
             RANGEV.setText("");
             RETV.setText("");
             STRV.setText("");
+            EXPV.setText("");
+            LVLV.setText("");
 
             owner.setText("");
         }
@@ -188,7 +203,7 @@ public class SelectedPane extends GridPane {
             } catch (Exception e){
                 System.err.println(e.toString());
             }
-            tileLocation.setText("Waiting to be placed");
+            tileLocation.setText("Off map");
             tileDefMod.setText("");
             tileEvaMod.setText("");
             tileMovMod.setText("");
@@ -204,16 +219,26 @@ public class SelectedPane extends GridPane {
             ACCV.setText(selectedUnit.getACC().toString());
             APTV.setText(selectedUnit.getCurACT() + "/" + selectedUnit.getAPT());
             CPAV.setText(selectedUnit.getCPA().toString());
-            DEFV.setText(selectedUnit.getDEF() + " (" + selectedUnit.getDEF() + selectedTile.getTerrain().getDefMod() + ")");
-            EVAV.setText(selectedUnit.getEVA() + " (" + selectedUnit.getEVA() + selectedTile.getTerrain().getEvaMod() + ")");
+            DEFV.setText(selectedUnit.getDEF().toString());
+            EVAV.setText(selectedUnit.getEVA().toString());
             HPV.setText(selectedUnit.getCurHP() + "/" + selectedUnit.getHP());
             MOVEV.setText(selectedUnit.getCurMOV() + "/" + selectedUnit.getMOVE());
             MPV.setText(selectedUnit.getCurMP() + "/" + selectedUnit.getMP());
             RANGEV.setText(selectedUnit.getRANGE().toString());
-            RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET() + " (" + selectedUnit.getRET() + selectedTile.getTerrain().getRetMod() + ")");
+            RETV.setText(selectedUnit.getCurRET() + "/" + selectedUnit.getRET());
             STRV.setText(selectedUnit.getSTR().toString());
+            EXPV.setText(selectedUnit.getCurEXP() + "/" + selectedUnit.getEXP());
+            LVLV.setText(selectedUnit.getLEVEL() + "/" + selectedUnit.getMaxLevel());
 
             owner.setText(owningPlayer.getPlayerName());
         }
+    }
+
+    public Tile getSelectedTile() {
+        return selectedTile;
+    }
+
+    public Unit getSelectedUnit() {
+        return selectedUnit;
     }
 }

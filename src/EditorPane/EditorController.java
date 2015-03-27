@@ -2,6 +2,7 @@ package EditorPane;
 
 import GUIs.*;
 import GameBoard.GameMap;
+import GameBoard.MapCell;
 import GameBoard.Terrain;
 import GameBoard.Tile;
 import javafx.application.Platform;
@@ -235,12 +236,12 @@ public class EditorController implements Initializable, BoardPaneObserver {
         scrollPane.setContent(boardPane);
         current.setContent(scrollPane);
         for(int i = 0; i < boardPane.getGameMap().getMaxPlayers(); i++) {
-            for (Tile sltile : boardPane.getGameMap().getStartLocs().get(i)){
+            for (MapCell slmc : boardPane.getGameMap().getStartLocs().get(i)){
                 //add color the tile on the editor
                 try {
                     String shadeName = SLSTRING + ((Integer) (i + 1)).toString() + ".png";
-                    ImageView shadeImage = new ImageView(new Image(new File(shadeName).toURI().toString()));
-                    boardPane.getBoardPaneButtons()[sltile.getX()][sltile.getY()].addShade(i, shadeImage);
+                    Image shadeImage = new Image(new File(shadeName).toURI().toString());
+                    boardPane.getBoardPaneButtons()[slmc.getTile().getX()][slmc.getTile().getY()].addShade(i, shadeImage);
                 } catch (IllegalArgumentException iae){
                     System.err.println(iae.toString());
                 }
@@ -266,17 +267,17 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     }
 
-    public void updateBoard(Tile tile){
+    public void updateBoard(BoardPaneButton boardPaneButton, Integer click){
         if(tool.equals(SELECTOR)) {
-            updateCurrentTile(tile);
+            updateCurrentTile(boardPaneButton.getTile());
         } else if (tool.equals(BRUSHWI)){
-            paintTile(tile, BRUSHWIW);
+            paintTile(boardPaneButton.getTile(), BRUSHWIW);
         } else if (tool.equals(BRUSHWII)){
-            paintTile(tile, BRUSHWIIW);
+            paintTile(boardPaneButton.getTile(), BRUSHWIIW);
         } else if (tool.equals(BRUSHWIII)){
-            paintTile(tile, BRUSHWIIIW);
+            paintTile(boardPaneButton.getTile(), BRUSHWIIIW);
         } else if (tool.equals(SLBRUSH)){
-            changeStartingLocation(tile);
+            changeStartingLocation(boardPaneButton.getTile());
         }
     }
 
@@ -293,7 +294,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
         editorTab.getTabs().add(new Tab(mapName + ".amap"));
         openMaps.add(new GameMap(mapName, width, height, maxPlayers));
         renderMap(openMaps.size()-1);
-        updateCurrentTile(openMaps.get(openMaps.size()-1).getTiles()[0][0]);
+        updateCurrentTile(openMaps.get(openMaps.size()-1).getMapCells()[0][0].getTile());
     }
 
     public void paintTile(Tile tile, int radius){
@@ -307,8 +308,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
                                 for(int r=0; r<=radius; r++) {
                                     if ((Math.abs(x - tile.getX()) <= r) && (y >= (tile.getY() - (radius - r/2)))
                                             && (y <= (tile.getY() + (radius - (r+1)/2)))) {
-                                        boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
-                                        boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
+                                        boardPane.getGameMap().getMapCells()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getGameMap().getMapCells()[x][y].getTile().setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTileImage().setImage(
@@ -320,8 +321,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
                                 for(int r=0; r<=radius; r++) {
                                     if ((Math.abs(x - tile.getX()) <= r) && (y >= (tile.getY() - (radius - (r+1)/2)))
                                             && (y <= (tile.getY() + (radius - r/2)))) {
-                                        boardPane.getGameMap().getTiles()[x][y].setTerrain(new Terrain(brushTile.getTerrain()));
-                                        boardPane.getGameMap().getTiles()[x][y].setImageName(brushTile.getImageName());
+                                        boardPane.getGameMap().getMapCells()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
+                                        boardPane.getGameMap().getMapCells()[x][y].getTile().setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setTerrain(new Terrain(brushTile.getTerrain()));
                                         boardPane.getBoardPaneButtons()[x][y].getTile().setImageName(brushTile.getImageName());
                                         boardPane.getBoardPaneButtons()[x][y].getTileImage().setImage(
@@ -345,10 +346,10 @@ public class EditorController implements Initializable, BoardPaneObserver {
                 BoardPane boardPane = ((BoardPane) (((ScrollPane) t.getContent())).getContent());
                 if(playerSLCState <= boardPane.getGameMap().getMaxPlayers()){
                     //check if the tile is already in the list
-                    for(Tile cltile: boardPane.getGameMap().getStartLocs().get(playerSLCState - 1)){
-                        if(cltile.equals(tile)){
+                    for(MapCell clmc: boardPane.getGameMap().getStartLocs().get(playerSLCState - 1)){
+                        if(clmc.getTile().equals(tile)){
                             //remove the tile
-                            boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).remove(cltile);
+                            boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).remove(clmc);
 
                             //remove the coloring on the editor
                             boardPane.getBoardPaneButtons()[tile.getX()][tile.getY()].removeShade(playerSLCState - 1);
@@ -358,12 +359,12 @@ public class EditorController implements Initializable, BoardPaneObserver {
                     }
 
                     //the tile was not found in the list already, so add the tile
-                    boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).add(tile);
+                    boardPane.getGameMap().getStartLocs().get(playerSLCState - 1).add(new MapCell(tile));
 
                     //add color the tile on the editor
                     try {
                         String shadeName = SLSTRING + playerSLCState.toString() + ".png";
-                        ImageView shadeImage = new ImageView(new Image(new File(shadeName).toURI().toString()));
+                        Image shadeImage = new Image(new File(shadeName).toURI().toString());
                         boardPane.getBoardPaneButtons()[tile.getX()][tile.getY()].addShade(playerSLCState - 1, shadeImage);
                     } catch (IllegalArgumentException iae){
                         System.err.println(iae.toString());

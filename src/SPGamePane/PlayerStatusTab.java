@@ -105,4 +105,8 @@ public class PlayerStatusTab extends Tab{
     public PlayerStatusPane getObserver() {
         return observer;
     }
+
+    public ListView<Unit> getUnitListV() {
+        return unitListV;
+    }
 }

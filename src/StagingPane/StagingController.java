@@ -2,9 +2,7 @@ package StagingPane;
 
 import GUIs.Navigator;
 import GameBoard.GameMap;
-import GameConcepts.ComputerPlayerB;
 import GameConcepts.Game;
-import GameConcepts.HumanPlayerB;
 import GameConcepts.Unit;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,7 +15,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -175,9 +172,9 @@ public class StagingController implements Initializable{
             }
             //for single player only the first player is human
             if(i == 0){
-                game.getPlayers().get(i).setPlayerBehavior(new HumanPlayerB());
+                game.getPlayers().get(i).setHuman(true);
             } else {
-                game.getPlayers().get(i).setPlayerBehavior(new ComputerPlayerB());
+                game.getPlayers().get(i).setHuman(false);
             }
         }
     }

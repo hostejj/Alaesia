@@ -2,7 +2,9 @@ package GameBoard;
 
 import GameConcepts.Unit;
 
-public class MapCell {
+import java.io.Serializable;
+
+public class MapCell implements Serializable{
     Tile tile;
     Unit unit; // may or may not be null
 
@@ -29,6 +31,14 @@ public class MapCell {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    @Override
+    public String toString() {
+        return "MapCell{" +
+                "tile=" + tile +
+                ", unit=" + unit +
+                '}';
     }
 
     @Override

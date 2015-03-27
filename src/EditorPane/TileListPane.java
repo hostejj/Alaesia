@@ -24,17 +24,19 @@ public class TileListPane extends GridPane {
     private final String tileListDirName = "Resources/TileImages/";
     private final String tileDatDirName = "Resources/TileData/";
     private final int MAXWIDTH = 3;
-    private static int columnIndex = 0;
-    private static int rowIndex = 0;
+    private int columnIndex = 0;
+    private int rowIndex = 0;
 
-    public ArrayList<String> tileList = new ArrayList<String>();
-    public ArrayList<TileListPaneButton> tiles = new ArrayList<TileListPaneButton>();
+    public ArrayList<String> tileList;
+    public ArrayList<TileListPaneButton> tiles;
 
     /**
      * Default constructor for TileListPane
      */
     public TileListPane() {
         super();
+        tileList = new ArrayList<String>();
+        tiles = new ArrayList<TileListPaneButton>();
         loadTiles();
         addTiles();
     }
@@ -126,7 +128,6 @@ public class TileListPane extends GridPane {
     public void update(Tile tile){
         observer.updateBrushTile(tile);
     }
-
 
     public void register(EditorController editorController){
         this.observer = editorController;

@@ -12,10 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
-
 import java.io.File;
-import java.lang.invoke.LambdaConversionException;
-import java.util.ArrayList;
 
 public class PlayerTab extends Tab {
     private PlayerPane observer;
@@ -124,6 +121,9 @@ public class PlayerTab extends Tab {
                         super.updateItem(item, empty);
                         if(item != null){
                             setText(item.getTypeName() + " --- " + item.getCharName());
+                        } else {
+                            setGraphic(null);
+                            setText(null);
                         }
                     }
                 };
@@ -135,8 +135,9 @@ public class PlayerTab extends Tab {
             @Override
             public void handle(MouseEvent event) {
                 selectedUnit = unitListV.getSelectionModel().getSelectedItem();
-
-                setUnitData();
+                if(selectedUnit != null) {
+                    setUnitData();
+                }
             }
         });
 
@@ -163,14 +164,11 @@ public class PlayerTab extends Tab {
         if(selectedUnit == null){
             return;
         }
-        for(Unit unit : unitObserv){
-            if(unit.equals(selectedUnit)){
-                unitObserv.remove(unit);
-                armyValue.setText(getArmyValue().toString() + "/" + observer.getObserver().getGame().getMaxArmyValue().toString() );
-                unitsTotal.setText(unitObserv.size() + "/" + maxUnits);
-                return;
-            }
-        }
+
+        unitObserv.remove(selectedUnit);
+        armyValue.setText(getArmyValue().toString() + "/" + observer.getObserver().getGame().getMaxArmyValue().toString());
+        unitsTotal.setText(unitObserv.size() + "/" + maxUnits);
+        return;
     }
 
     public void setUnitData(){

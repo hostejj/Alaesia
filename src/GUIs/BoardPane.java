@@ -29,12 +29,12 @@ public class BoardPane extends Pane {
      */
     public BoardPane(GameMap gameMap, BoardPaneObserver boardPaneObserver){
         super();
-        this.gameMap = new GameMap(gameMap);
+        this.gameMap = gameMap;
         this.boardPaneObserver = boardPaneObserver;
         this.boardPaneButtons = new BoardPaneButton[gameMap.getWidth()][gameMap.getHeight()];
         for(int j=0; j<gameMap.getHeight(); j++){
             for(int i=0; i<gameMap.getWidth(); i++){
-                boardPaneButtons[i][j] = new BoardPaneButton(gameMap.getTiles()[i][j], this);
+                boardPaneButtons[i][j] = new BoardPaneButton(gameMap.getMapCells()[i][j], this);
                 this.getChildren().add(boardPaneButtons[i][j]);
             }
         }
@@ -78,7 +78,7 @@ public class BoardPane extends Pane {
         return boardPaneButtons;
     }
 
-    public void update(Tile tile) {
-        boardPaneObserver.updateBoard(tile);
+    public void update(BoardPaneButton boardPaneButton, Integer click) {
+        boardPaneObserver.updateBoard(boardPaneButton, click);
     }
 }

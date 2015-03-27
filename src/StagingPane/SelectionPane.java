@@ -130,6 +130,8 @@ public class SelectionPane extends GridPane {
             public void handle(MouseEvent me) {
                 if(selectedUnit != null) {
                     observer.update(observer.ADD);
+                    selectedUnit.setCharName(chooseRandName());
+                    charNameV.setText(selectedUnit.getCharName());
                 }
             }
         });

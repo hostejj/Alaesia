@@ -47,7 +47,7 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.CPA = 2;
         this.DEF = 3;
         this.EVA = 10;
-        this.EXP = 0;
+        this.EXP = 30;
         this.HP = 15;
         this.LEVEL = 1;
         this.MOVE = 5;
@@ -122,7 +122,7 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.curHP = u.HP;
         this.curMP = u.MP;
         this.curACT = u.APT;
-        this.curEXP = u.EXP;
+        this.curEXP = u.curEXP;
         this.curMOV = u.MOVE;
         this.curRET = u.RET;
 

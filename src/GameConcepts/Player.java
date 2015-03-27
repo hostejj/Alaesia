@@ -8,13 +8,16 @@ public class Player implements Serializable{
 
     private String playerName;
     private ArrayList<Unit> army;
-    private PlayerBehavior playerBehavior;
     private Integer turnPoints;
+    private boolean human;
+    private AIDecisions aiDecisions;
 
-    public Player(){
+    public Player() {
         playerName = DEFAULTPLAYERNAME;
         army = new ArrayList<Unit>();
         turnPoints = 0;
+        human = true;
+        aiDecisions = new AIDecisions(this);
     }
 
     public ArrayList<Unit> getArmy() {
@@ -41,11 +44,15 @@ public class Player implements Serializable{
         this.playerName = playerName;
     }
 
-    public PlayerBehavior getPlayerBehavior() {
-        return playerBehavior;
+    public boolean isHuman() {
+        return human;
     }
 
-    public void setPlayerBehavior(PlayerBehavior playerBehavior) {
-        this.playerBehavior = playerBehavior;
+    public void setHuman(boolean human) {
+        this.human = human;
+    }
+
+    public AIDecisions makeMove(){
+        return aiDecisions;
     }
 }

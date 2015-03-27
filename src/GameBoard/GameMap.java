@@ -4,6 +4,7 @@ import GameConcepts.Unit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * The GameMap is the bean class which houses all of the game data on units and their location. It contains
@@ -26,12 +27,12 @@ public class GameMap implements Serializable {
     private final int MAXPLAYERS = 4;
 
     private String mapName;
-    private Tile[][] tiles;
+    private MapCell[][] mapCells;
     private int width;
     private int height;
     private ArrayList<Unit> units;
     private Integer maxPlayers;
-    private ArrayList<ArrayList<Tile>> startLocs;
+    private ArrayList<ArrayList<MapCell>> startLocs;
 
     /**
      * Default constructor for GameMap class which creates a unit-less map of default tiles
@@ -40,10 +41,10 @@ public class GameMap implements Serializable {
     public GameMap(){
         mapName = DEFAULTNAME;
 
-        tiles = new Tile[DEFAULTWIDTH][DEFAULTHEIGHT];
-        for(int j=0; j<tiles[0].length; j++){
-            for(int i=0; i<tiles.length; i++){
-                tiles[i][j] = new Tile(i, j);
+        mapCells = new MapCell[DEFAULTWIDTH][DEFAULTHEIGHT];
+        for(int j=0; j<mapCells[0].length; j++){
+            for(int i=0; i<mapCells.length; i++){
+                mapCells[i][j] = new MapCell(new Tile(i,j));
             }
         }
         width = DEFAULTWIDTH;
@@ -52,9 +53,9 @@ public class GameMap implements Serializable {
 
         units = new ArrayList<Unit>();
 
-        startLocs = new ArrayList<ArrayList<Tile>>();
+        startLocs = new ArrayList<ArrayList<MapCell>>();
         for(int i = 0; i < maxPlayers; i++){
-            startLocs.add(new ArrayList<Tile>());
+            startLocs.add(new ArrayList<MapCell>());
         }
     }
 
@@ -69,10 +70,10 @@ public class GameMap implements Serializable {
     public GameMap(String mapName, int width, int height, int maxPlayers){
         this.mapName = mapName;
 
-        tiles = new Tile[width][height];
-        for(int j=0; j<tiles[0].length; j++){
-            for(int i=0; i<tiles.length; i++){
-                tiles[i][j] = new Tile(i, j);
+        mapCells = new MapCell[width][height];
+        for(int j=0; j<mapCells[0].length; j++){
+            for(int i=0; i<mapCells.length; i++){
+                mapCells[i][j] = new MapCell(new Tile(i, j));
             }
         }
 
@@ -82,9 +83,9 @@ public class GameMap implements Serializable {
 
         units = new ArrayList<Unit>();
 
-        startLocs = new ArrayList<ArrayList<Tile>>();
+        startLocs = new ArrayList<ArrayList<MapCell>>();
         for(int i = 0; i < this.maxPlayers; i++){
-            startLocs.add(new ArrayList<Tile>());
+            startLocs.add(new ArrayList<MapCell>());
         }
     }
 
@@ -95,10 +96,10 @@ public class GameMap implements Serializable {
     public GameMap(GameMap gameMap){
         this.mapName = gameMap.mapName;
 
-        this.tiles = new Tile[gameMap.width][gameMap.height];
-        for(int j=0; j<this.tiles[0].length; j++){
-            for(int i=0; i<this.tiles.length; i++){
-                this.tiles[i][j] = new Tile(gameMap.getTiles()[i][j]);
+        this.mapCells = new MapCell[gameMap.width][gameMap.height];
+        for(int j=0; j<this.mapCells[0].length; j++){
+            for(int i=0; i<this.mapCells.length; i++){
+                this.mapCells[i][j] = gameMap.getMapCells()[i][j];
             }
         }
 
@@ -111,11 +112,11 @@ public class GameMap implements Serializable {
             units.add(new Unit(u));
         }
 
-        this.startLocs = new ArrayList<ArrayList<Tile>>();
+        this.startLocs = new ArrayList<ArrayList<MapCell>>();
         for(int i = 0; i < this.maxPlayers; i++){
-            this.startLocs.add(new ArrayList<Tile>());
-            for (Tile t: gameMap.startLocs.get(i)){
-                this.startLocs.get(i).add(new Tile(t));
+            this.startLocs.add(new ArrayList<MapCell>());
+            for (MapCell mc: gameMap.startLocs.get(i)){
+                this.startLocs.get(i).add(mc);
             }
         }
     }
@@ -176,8 +177,8 @@ public class GameMap implements Serializable {
         this.mapName = mapName;
     }
 
-    public Tile[][] getTiles() {
-        return tiles;
+    public MapCell[][] getMapCells() {
+        return mapCells;
     }
 
     public ArrayList<Unit> getUnits() {
@@ -188,8 +189,55 @@ public class GameMap implements Serializable {
         return maxPlayers;
     }
 
-    public ArrayList<ArrayList<Tile>> getStartLocs() {
+    public ArrayList<ArrayList<MapCell>> getStartLocs() {
         return startLocs;
+    }
+
+    public MapCell locateUnit(Unit unit){
+        for (MapCell[] mca: mapCells) {
+            for (MapCell mc : mca) {
+                if (mc.getUnit() == unit) {
+                    return mc;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<MapCell> getNeighboringCells(MapCell mc, Integer radius){
+        ArrayList<MapCell> neighbors = new ArrayList<MapCell>();
+        Integer cx = mc.getTile().getX();
+        Integer cy = mc.getTile().getY();
+
+        for(int y = cy - radius; y <= cy + radius; y++) {
+            for (int x = cx - radius; x <= cx + radius; x++) {
+                if((x>=0) && (y>=0) && (x < width) && (y < height) && (!((x==cx) && (y==cy)))) {
+                    if (cx % 2 == 1) {
+                        if(x % 2 ==1){
+                            if((y >= cy - radius) && (y <= (cy + radius))){
+                                neighbors.add(mapCells[x][y]);
+                            }
+                        } else {
+                            if((y > cy - radius) && (y <= (cy + radius))){
+                                neighbors.add(mapCells[x][y]);
+                            }
+                        }
+                    } else {
+                        if(x % 2 == 1){
+                            if((y >= cy - radius) && (y < (cy + radius))){
+                                neighbors.add(mapCells[x][y]);
+                            }
+                        } else {
+                            if((y >= (cy - radius)) && (y <= (cy + radius))){
+                                neighbors.add(mapCells[x][y]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return neighbors;
     }
 
     /**
@@ -199,8 +247,8 @@ public class GameMap implements Serializable {
     @Override
     public String toString() {
         String tileString = "";
-        for(Tile[] y: tiles){
-            for (Tile x : y) {
+        for(MapCell[] y: mapCells){
+            for (MapCell x : y) {
                 tileString += x.toString();
             }
             tileString += "\t";
@@ -212,9 +260,9 @@ public class GameMap implements Serializable {
         }
 
         String slString = "";
-        for (ArrayList<Tile> staLoc: startLocs){
-            for (Tile t: staLoc){
-                slString += t.toString();
+        for (ArrayList<MapCell> staLoc: startLocs){
+            for (MapCell mc: staLoc){
+                slString += mc.toString();
             }
             slString += "\t";
         }
