@@ -6,6 +6,7 @@ import GameBoard.Tile;
 import GameConcepts.Game;
 import GameConcepts.Player;
 import GameConcepts.Unit;
+import StagingPane.PlayerTab;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -119,6 +120,10 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     public void update(int choice){
         switch (choice){
             case PASS:
+                if(Game.GameState.UNITMOVE  == game.getGameState()) {
+                    invalidPopup("Cannot end the turn while you still have a unit in action.");
+                    break;
+                }
                 game.nextPlayer();
                 break;
             case SELECTED:
@@ -144,7 +149,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 } else {
                     selectedPane.updateSelected(selectedBoardPaneButton.getTile(), selectedBoardPaneButton.getUnit(),
                             null);
-                    clearHighlights();
+                    ownerHighlights();
                 }
                 break;
             case PLACE:
@@ -160,24 +165,63 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 break;
             case USE:
                 if(unitToUse != null){
-                    if(game.getCurrentPlayer().getArmy().contains(unitToUse)){
-                        if((game.getCurrentPlayer().getTurnPoints() >= unitToUse.getCPA()) && (unitToUse.getCurACT() > 0)) {
-                            game.getCurrentPlayer().setTurnPoints(game.getCurrentPlayer().getTurnPoints() - unitToUse.getCPA());
-                            game.getCurrentPlayer().setUnitInUse(unitToUse);
-                            game.setGameState(Game.GameState.UNITMOVE);
-                        }
+                    if(!game.getCurrentPlayer().getArmy().contains(unitToUse)) {
+                        invalidPopup("You do not own this unit.");
+                        break;
                     }
+                    if(game.getCurrentPlayer().getTurnPoints() < unitToUse.getCPA()){
+                        invalidPopup("You do not have enough action points.");
+                        break;
+                    }
+                    if(unitToUse.getCurACT() <= 0) {
+                        invalidPopup("The selected unit does not have enough actions.");
+                        break;
+                    }
+                    game.getCurrentPlayer().setTurnPoints(game.getCurrentPlayer().getTurnPoints() - unitToUse.getCPA());
+                    ((PlayerStatusTab) playerStatusPane.getTabs().get(game.getPlayerIndex(game.getCurrentPlayer()))).setTurnPoints(
+                            game.getCurrentPlayer().getTurnPoints().toString() + "/" + game.getMaxTurnPoints()
+                    );
+                    game.getCurrentPlayer().setUnitInUse(unitToUse);
+                    game.getCurrentPlayer().getUnitInUse().setCurACT(game.getCurrentPlayer().getUnitInUse().getCurACT() - 1);
+                    game.setGameState(Game.GameState.UNITMOVE);
                 }
                 break;
             case MOVE:
+                MapCell sourceMC = game.getGameMap().locateUnit(game.getCurrentPlayer().getUnitInUse());
+                BoardPaneButton sourceBPB = boardPane.getBoardPaneButtons()[sourceMC.getTile().getX()][sourceMC.getTile().getY()];
+                game.moveUnit(selectedBoardPaneButton.getMapCell());
+                if(game.isErrorFlag()){
+                    invalidPopup(game.getErrorMessage());
+                    game.setErrorFlag(false);
+                } else {
+                    sourceBPB.getUnitImage().setImage(null);
+                    selectedBoardPaneButton.getUnitImage().setImage(new Image(
+                            new File(selectedBoardPaneButton.getUnit().getImageName()).toURI().toString()));
+                    highlightAvailable(selectedBoardPaneButton.getUnit());
+                }
                 break;
             case ATTACK:
-                break;
-            case END:
-                if(game.getCurrentPlayer().getUnitInUse() != null){
-                    game.getCurrentPlayer().setUnitInUse(null);
-                    game.setGameState(Game.GameState.BATTLE);
+                //attack the target mapcell
+                game.attackUnit(selectedBoardPaneButton.getMapCell());
+                if(game.isErrorFlag()){
+                    invalidPopup(game.getErrorMessage());
+                    game.setErrorFlag(false);
+                    break;
+                } else {
+                    //check for two different deaths
+                    if (game.getCurrentPlayer().getUnitInUse().getCurHP() <= 0) {
+                        Tile unitTile = game.getGameMap().locateUnit(game.getCurrentPlayer().getUnitInUse()).getTile();
+                        game.unitDeath(game.getCurrentPlayer().getUnitInUse());
+                        boardPane.getBoardPaneButtons()[unitTile.getX()][unitTile.getY()].getUnitImage().setImage(null);
+                    }
+                    if (selectedBoardPaneButton.getMapCell().getUnit().getCurHP() <= 0) {
+                        game.unitDeath(selectedBoardPaneButton.getMapCell().getUnit());
+                        selectedBoardPaneButton.getUnitImage().setImage(null);
+                    }
                 }
+            case END:
+                game.getCurrentPlayer().setUnitInUse(null);
+                game.setGameState(Game.GameState.BATTLE);
                 break;
             default:
                 break;
@@ -225,6 +269,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
         GridPane popupGrid = new GridPane();
         Label messageL = new Label(message);
         Button okay = new Button("Ok");
+        popup.getIcons().setAll(new Image(new File("Resources/InterfaceImages/IconImage.png").toURI().toString()));
 
         popupGrid.setPadding(new Insets(10,10,10,10));
         messageL.setWrapText(true);
@@ -261,6 +306,10 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     }
                     else if(game.getGameState() == Game.GameState.BATTLE){
                         game.nextPlayer();
+                    } else if(game.getGameState() == Game.GameState.UNITMOVE){
+                        System.err.println("Error phase");
+                    } else if(game.getGameState() == Game.GameState.GAMEOVER){
+                        System.err.println("Error phase");
                     }
                     // Not really necessary to choose the move in a application-threaded task, but this is to
                     // demonstrate how to implement this for a game where choosing a move may take a long time.
@@ -349,6 +398,27 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     bpb.removeAllShades();
                 }
             }
+        }
+    }
+
+    public void ownerHighlights(){
+        clearHighlights();
+        if(game.getGameState() == Game.GameState.BATTLE){
+            for(BoardPaneButton[] bpba: boardPane.getBoardPaneButtons()){
+                for(BoardPaneButton bpb: bpba){
+                    if(bpb.getUnit() != null){
+                        if(bpb.getUnit().getCurACT() > 0) {
+                            Integer pindex = game.getPlayerIndex(game.findOwner(bpb.getUnit()));
+                            bpb.addShade(pindex, new Image(new File(SHADENAME + (pindex + 1) + ".png").toURI().toString()));
+                        }
+                    }
+                }
+            }
+        } else if(game.getGameState() == Game.GameState.UNITMOVE){
+            MapCell mc = game.getGameMap().locateUnit(game.getCurrentPlayer().getUnitInUse());
+            Integer pindex = game.getPlayerIndex(game.findOwner(game.getCurrentPlayer().getUnitInUse()));
+            boardPane.getBoardPaneButtons()[mc.getTile().getX()][mc.getTile().getY()].addShade(pindex, new Image(
+                    new File(SHADENAME + (pindex + 1) + ".png").toURI().toString()));
         }
     }
 

@@ -14,19 +14,15 @@ public class OptionsPane extends GridPane {
     private final static int MINAPOINTS = 20;
     private final static int MAXAPOINTS = 100;
     private final static int DEFAPOINTS = 30;
-    private final static int MINTPOINTS = 10;
-    private final static int MAXTPOINTS = 50;
-    private final static int DEFTPOINTS = 20;
-    private final static int MINTLIMIT= 20;
+    private final static int MINTPOINTS = 5;
+    private final static int MAXTPOINTS = 30;
+    private final static int DEFTPOINTS = 10;
+    private final static int MINTLIMIT = 20;
     private final static int MAXTLIMIT = 200;
     private final static int DEFTLIMIT = 50;
 
     private final static int SLIDEMINTICK = 1;
     private final static int SLIDEMAJTICK = 5;
-
-    private final static int STARTBUTTON = 0;
-    private final static int BACKBUTTON = 1;
-
 
     private StagingController observer;
     private Label armyPoints;

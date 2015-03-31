@@ -44,4 +44,8 @@ public class SelectionPaneUnitButton extends ImageView {
             }
         });
     }
+
+    public Unit getUnit() {
+        return unit;
+    }
 }

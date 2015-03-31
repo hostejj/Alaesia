@@ -106,6 +106,10 @@ public class PlayerStatusTab extends Tab{
         return observer;
     }
 
+    public void setTurnPoints(String turnPoints) {
+        this.turnPoints.setText(turnPoints);
+    }
+
     public ListView<Unit> getUnitListV() {
         return unitListV;
     }

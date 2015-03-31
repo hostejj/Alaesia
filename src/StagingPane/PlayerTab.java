@@ -59,6 +59,7 @@ public class PlayerTab extends Tab {
     private Label DESCV = new Label("");
 
     private Button removeUnit = new Button("Remove Unit");
+    private Button generateRND = new Button("Generate Army");
 
     public PlayerTab(String playerName, PlayerPane playerPane, Integer maxUnits){
         register(playerPane);
@@ -75,7 +76,7 @@ public class PlayerTab extends Tab {
         gridPane.add(armyValue,1,0);
         gridPane.add(unitsTotalL,0,1);
         gridPane.add(unitsTotal,1,1);
-        gridPane.add(unitListV,0,2,2,16);
+        gridPane.add(unitListV,0,2,2,18);
 
         gridPane.add(unitImage, 2, 0, 2, 2);
         gridPane.add(typeVal, 2, 2);
@@ -111,6 +112,7 @@ public class PlayerTab extends Tab {
         gridPane.add(DESCV, 2, 16, 2, 1);
 
         gridPane.add(removeUnit, 2,17,2,1);
+        gridPane.add(generateRND, 2,18,2,1);
 
         unitListV.setCellFactory(new Callback<ListView<Unit>, ListCell<Unit>>() {
             @Override
@@ -148,6 +150,12 @@ public class PlayerTab extends Tab {
             }
         });
 
+        generateRND.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                observer.getObserver().update(observer.getObserver().RND);
+            }
+        });
         this.setContent(gridPane);
     }
 
@@ -169,6 +177,15 @@ public class PlayerTab extends Tab {
         armyValue.setText(getArmyValue().toString() + "/" + observer.getObserver().getGame().getMaxArmyValue().toString());
         unitsTotal.setText(unitObserv.size() + "/" + maxUnits);
         return;
+    }
+
+    public void removeAllUnits(){
+        int length = unitObserv.size();
+        for(int i = 0; i < length; i++ ){
+            unitObserv.remove(0);
+        }
+        armyValue.setText(getArmyValue().toString() + "/" + observer.getObserver().getGame().getMaxArmyValue().toString());
+        unitsTotal.setText(unitObserv.size() + "/" + maxUnits);
     }
 
     public void setUnitData(){

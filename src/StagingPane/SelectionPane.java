@@ -310,4 +310,12 @@ public class SelectionPane extends GridPane {
     public Unit getSelectedUnit() {
         return selectedUnit;
     }
+
+    public void setSelectedUnit(Unit selectedUnit) {
+        this.selectedUnit = selectedUnit;
+    }
+
+    public ArrayList<SelectionPaneUnitButton> getUnits() {
+        return units;
+    }
 }

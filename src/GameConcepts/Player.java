@@ -9,6 +9,7 @@ public class Player implements Serializable{
     private String playerName;
     private ArrayList<Unit> army;
     private Integer turnPoints;
+    private Integer maxTurnPoints;
     private boolean human;
     private AIDecisions aiDecisions;
     private Unit unitInUse;
@@ -17,6 +18,7 @@ public class Player implements Serializable{
         playerName = DEFAULTPLAYERNAME;
         army = new ArrayList<Unit>();
         turnPoints = 0;
+        maxTurnPoints = 0;
         human = true;
         aiDecisions = new AIDecisions(this);
         unitInUse = null;
@@ -68,5 +70,29 @@ public class Player implements Serializable{
 
     public AIDecisions makeMove(){
         return aiDecisions;
+    }
+
+    public Integer getMaxTurnPoints() {
+        return maxTurnPoints;
+    }
+
+    public void setMaxTurnPoints(Integer maxTurnPoints) {
+        this.maxTurnPoints = maxTurnPoints;
+    }
+
+    public void removeUnit(Unit u){
+        if(army.contains(u)){
+            army.remove(u);
+        }
+        if(unitInUse == u){
+            unitInUse = null;
+        }
+    }
+
+    public void refreshPlayer(){
+        turnPoints = maxTurnPoints;
+        for(Unit unit:army){
+            unit.refreshUnit();
+        }
     }
 }

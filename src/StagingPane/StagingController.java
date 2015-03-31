@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class StagingController implements Initializable{
@@ -34,6 +35,7 @@ public class StagingController implements Initializable{
     public static Integer SEL = 1;
     public static Integer START = 2;
     public static Integer ADD = 3;
+    public static Integer RND = 4;
 
     private Game game;
 
@@ -69,6 +71,20 @@ public class StagingController implements Initializable{
                         ((PlayerTab) pT).addUnit(selectionPane.getSelectedUnit());
                         break; // no need to continue searching if already found
                     }
+                }
+            }
+        } else if (choice == RND){
+            for (Tab pT : playerPane.getTabs()) {
+                if(pT.isSelected()){
+                    ((PlayerTab) pT).removeAllUnits();
+                    Random random = new Random();
+                    for(int i = 0; i < ((PlayerTab) pT).getMaxUnits(); i++){
+                        Integer rindex = random.nextInt(selectionPane.getUnits().size());
+                        selectionPane.setSelectedUnit(selectionPane.getUnits().get(rindex).getUnit());
+                        selectionPane.getSelectedUnit().setCharName(selectionPane.chooseRandName());
+                        ((PlayerTab) pT).addUnit(selectionPane.getSelectedUnit());
+                    }
+                    break; // no need to continue searching if already found
                 }
             }
         }

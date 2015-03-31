@@ -3,9 +3,11 @@ package GUIs;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class PrimaryPane extends Application {
@@ -13,6 +15,13 @@ public class PrimaryPane extends Application {
     @Override
     public void start(Stage stage) throws Exception{
         stage.setTitle("Alaesia");
+
+        //setup game icon
+        try {
+            stage.getIcons().addAll(new Image(new File("Resources/InterfaceImages/IconImage.png").toURI().toString()));
+        } catch (Exception e){
+            System.err.println(e.toString());
+        }
 
         stage.setScene(
                 createScene(

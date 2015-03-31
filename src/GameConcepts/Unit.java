@@ -342,6 +342,33 @@ public class Unit implements Serializable, Comparable<Unit> {
         MaxLevel = maxLevel;
     }
 
+    public void refreshUnit(){
+        if(curACT == APT){ // heal if the unit rested this round
+            if(curHP < HP){
+                curHP++;
+            }
+        }
+
+        this.curACT = APT;
+        this.curMOV = MOVE;
+        this.curRET = RET;
+    }
+
+    public void addExperience(Integer addExp){
+        curEXP += addExp;
+        if(curEXP > EXP){
+            levelUp();
+        }
+    }
+
+    public void levelUp(){
+        if(LEVEL < MaxLevel){ //increase the level counter
+            LEVEL++;
+        }
+
+        //level the unit up based on??? level up characteristics to be added?
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

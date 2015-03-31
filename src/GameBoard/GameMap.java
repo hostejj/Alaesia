@@ -1,7 +1,9 @@
 package GameBoard;
 
 import GameConcepts.Unit;
+import jdk.internal.org.objectweb.asm.tree.InnerClassNode;
 
+import javax.crypto.Mac;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
@@ -283,6 +285,89 @@ public class GameMap implements Serializable {
         }
 
         return neighbors;
+    }
+
+    /**
+     * Finds the shortest path from a given unit to a given MapCell provided the unit has enough movement to reach it.
+     * @param target The map cell to find a path to.
+     * @param u The unit that the path is from.
+     * @return
+     */
+    public ArrayList<MapCell> findPathToMC(MapCell target, Unit u){
+        ArrayList<MapCell> shortestPath = new ArrayList<MapCell>();
+        ArrayList<MapCell> tempPath = new ArrayList<MapCell>();
+        MapCell unitLocation = locateUnit(u);
+        Integer unitMovement = u.getCurMOV();
+
+        findShortPathRecurseHelper(shortestPath, tempPath, target, unitLocation, unitMovement);
+
+        return shortestPath;
+    }
+
+    private void findShortPathRecurseHelper(ArrayList<MapCell> sPath, ArrayList<MapCell> tmpPath,
+                                            MapCell target, MapCell source, Integer movement){
+        ArrayList<MapCell> neighbors;
+
+        if(source != null){
+            neighbors = getNeighboringCells(source, 1);
+
+            for(MapCell tmc: neighbors){
+                if(tmc.getUnit() == null){//only count the mapcell if it can  be walked on.
+                    // only count the tile if the unit could make it to the tile
+                    if(movement >= (1 + tmc.getTile().getTerrain().getMovMod())){
+                        if(tmc == target){ //found the desired tile
+                            tmpPath.add(tmc);
+                            if(isShorter(sPath, tmpPath)){
+                                sPath.clear();
+                                for(MapCell mc: tmpPath){
+                                    sPath.add(mc); // new shortest path
+                                }
+                            }
+                            tmpPath.remove(tmpPath.size() - 1);
+                        } else {
+                            //recurse on the neighbors of the MC
+                            tmpPath.add(tmc); // add to the temporary path
+                            Integer newMove = movement - (1 + tmc.getTile().getTerrain().getMovMod());
+                            findShortPathRecurseHelper(sPath, tmpPath, target, tmc, newMove);
+                        }
+                    }
+                }
+            }
+            if(tmpPath.contains(source)){
+                tmpPath.remove(source);
+            }
+        }
+    }
+
+    /**
+     * Determines which path of cells is shorter.
+     * @param shortest The current shortest path.
+     * @param challenger The path that might be shorter.
+     * @return true if challenger is shorter, false otherwise.
+     */
+    public boolean isShorter(ArrayList<MapCell> shortest, ArrayList<MapCell> challenger){
+        if(challenger.isEmpty()){ // must have at least one mc
+            return false;
+        }
+        if(shortest.isEmpty()){ // must have at least one mc
+            return true;
+        }
+        Integer sLength = 0;
+        Integer cLength = 0;
+
+        for(MapCell mc: shortest){
+            if(mc != null){
+                sLength += (1 + mc.getTile().getTerrain().getMovMod());
+            }
+        }
+
+        for(MapCell mc: challenger){
+            if(mc != null){
+                cLength += (1 + mc.getTile().getTerrain().getMovMod());
+            }
+        }
+
+        return (sLength > cLength);
     }
 
     /**

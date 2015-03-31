@@ -7,6 +7,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Game implements Serializable {
     private ArrayList<Player> players;
@@ -17,6 +18,12 @@ public class Game implements Serializable {
 
     private String errorMessage = "";
     private boolean errorFlag = false;
+    private final static Integer HITPERCENT = 100;
+    private final static Integer CRITDIV = 15;
+    private final static Double CRITMULT = 1.5;
+    private final static Integer MINBOUND = 8;
+    private final static Integer MAXBOUND = 12;
+
 
     public static enum GameState {
         PLACEMENTPHASE, BATTLE, UNITMOVE, GAMEOVER
@@ -32,7 +39,11 @@ public class Game implements Serializable {
         this.turnLimit = turnLimit;
 
         players = new ArrayList<Player>();
-        for (int i=0;i<gameMap.getMaxPlayers(); i++){ players.add(new Player()); }
+        for (int i=0;i<gameMap.getMaxPlayers(); i++){
+            players.add(new Player());
+            players.get(i).setTurnPoints(maxTurnPoints);
+            players.get(i).setMaxTurnPoints(maxTurnPoints);
+        }
     }
 
     public ArrayList<Player> getPlayers() {
@@ -81,9 +92,11 @@ public class Game implements Serializable {
         for(int i = 0; i < players.size(); i++){
             if(players.get(i) == getCurrentPlayer()){
                 if(i < players.size() - 1){
+                    getCurrentPlayer().refreshPlayer();
                     currentPlayer.set(players.get(i + 1));
                     return;
                 } else {
+                    getCurrentPlayer().refreshPlayer();
                     currentPlayer.set(players.get(0));
                     return;
                 }
@@ -170,6 +183,186 @@ public class Game implements Serializable {
         if(checkPlacementPhaseOver()) { //determine if the placement phase has ended
             gameState.set(GameState.BATTLE);
         }
+    }
+
+    /**
+     * During the battle phase of the game, move the unit in use of the current player.
+     * The unit should move to a MC that is currently empty and in the list of actionable MCs.
+     */
+    public void moveUnit(MapCell mapCell){
+        //use the current player unit in use
+        Unit u = getCurrentPlayer().getUnitInUse();
+        if(u != null){
+            if(mapCell != null){
+                if (mapCell.getUnit() != null){
+                    errorFlag = true;
+                    errorMessage = "Cannot move to a tile that already has a unit on it.";
+                    return;
+                }
+                ArrayList<MapCell> path = gameMap.findPathToMC(mapCell, u);
+                if(path.isEmpty()){
+                    errorFlag = true;
+                    errorMessage = "Cannot find a path to the selected cell.";
+                    return;
+                }
+
+                //found a path so its okay to move the unit
+                Integer moveCost = 0;
+                for(MapCell mc: path){
+                    moveCost += (1 + mc.getTile().getTerrain().getMovMod());
+                }
+                u.setCurMOV(u.getCurMOV() - moveCost);
+                MapCell sourceLoc = gameMap.locateUnit(u);
+                sourceLoc.setUnit(null); // remove unit from its last location
+                gameMap.getMapCells()[mapCell.getTile().getX()][mapCell.getTile().getY()].setUnit(u);
+
+            }
+        }
+    }
+
+    /**
+     * With the unit in use attack the unit on a target map cell. The target must
+     * be withing the range of the unit in use.
+     * @param target The cell that is being attacked.
+     */
+    public void attackUnit(MapCell target) {
+
+        if (!attackValid(target)) {
+            return;
+        }
+
+        //use the current player unit in use
+        Unit u = getCurrentPlayer().getUnitInUse();
+
+        //the attack is valid so do the attack
+        Integer moveCost = 0;
+        u.setCurMOV(u.getCurMOV() - 1); // an attack costs 1 movement
+
+        Random random = new Random();
+        boolean died = false;
+
+        //see if the attack hits the oppenent
+        Integer hitChance = u.getACC() - (target.getUnit().getEVA() + target.getTile().getTerrain().getEvaMod());
+        if(random.nextInt(HITPERCENT) < hitChance){
+            //the attack was successful check for a critical hit
+            boolean crit = false;
+            if(random.nextInt(HITPERCENT) < hitChance/CRITDIV){
+                crit = true;
+            }
+
+            Integer damage = u.getSTR() - (target.getUnit().getDEF() + target.getTile().getTerrain().getDefMod());
+
+            if(crit){
+                damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND
+                        - MINBOUND) + MINBOUND)/10.0) * CRITMULT.doubleValue())).intValue();
+            } else {
+                damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND - MINBOUND) + MINBOUND)/10.0))).intValue();
+            }
+
+            target.getUnit().setCurHP(target.getUnit().getCurHP() - damage);
+
+            if(target.getUnit().getCurHP() <= 0){ //the target died
+                died = true;
+            }
+        }
+
+        if(!died){
+            //opposing unit can retaliate if within range
+            if((target.getUnit().getCurRET() + target.getTile().getTerrain().getRetMod()) > 0){
+
+                //find out if the attacker is in range of defender retaliation
+                if(inAttackRange(gameMap.locateUnit(u), target.getUnit())) {
+                    target.getUnit().setCurRET(target.getUnit().getCurRET() - 1);
+
+                    hitChance = target.getUnit().getACC() - (u.getEVA() + gameMap.locateUnit(u).getTile().getTerrain().getEvaMod());
+                    if(random.nextInt(HITPERCENT) < hitChance){
+                        //the attack was successful check for a critical hit
+                        boolean crit = false;
+                        if(random.nextInt(HITPERCENT) < hitChance/CRITDIV){
+                            crit = true;
+                        }
+
+                        Integer damage = target.getUnit().getSTR() - (u.getDEF() + gameMap.locateUnit(u).getTile().getTerrain().getDefMod());
+
+                        if(crit){
+                            damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND
+                                    - MINBOUND) + MINBOUND)/10.0) * CRITMULT.doubleValue())).intValue();
+                        } else {
+                            damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND - MINBOUND) + MINBOUND)/10.0))).intValue();
+                        }
+
+                        u.setCurHP(u.getCurHP() - damage);
+                    }
+                }
+            }
+        }
+    }
+
+    public void unitDeath(Unit unit){
+        Player owner = findOwner(unit);
+        MapCell location = gameMap.locateUnit(unit);
+
+        owner.removeUnit(unit);
+        location.setUnit(null);
+
+        //perhaps check for victory?
+    }
+
+    public boolean attackValid(MapCell target) {
+        //use the current player unit in use
+        Unit u = getCurrentPlayer().getUnitInUse();
+        if (u != null) {
+            if (target != null) {
+                if (target.getUnit() == null) {
+                    errorFlag = true;
+                    errorMessage = "Cannot attack a tile that already has a no on it.";
+                    return false;
+                }
+                if (findOwner(target.getUnit()) == getCurrentPlayer()) {
+                    errorFlag = true;
+                    errorMessage = "Cannot attack a tile that already has your own unit on it.";
+                    return false;
+                }
+                if (u.getCurMOV() < 1) {
+                    errorFlag = true;
+                    errorMessage = "Cannot attack because the unit does not have enough movement.";
+                    return false;
+                }
+                if (!inAttackRange(target, u)) {
+                    errorFlag = true;
+                    errorMessage = "The selected tile is not in range of being attacked.";
+                    return false;
+                }
+
+                // the attack is valid
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether or not a target tile is within the attack range of a unit;
+     * @param target The tile to be attacked.
+     * @param u The unit doing the attacking
+     * @return
+     */
+    public boolean inAttackRange(MapCell target, Unit u){
+        ArrayList<MapCell> attackable = new ArrayList<MapCell>();
+        for (int i = u.getMinRANGE(); i <= u.getMaxRANGE(); i++) {
+            ArrayList<MapCell> neighbors = gameMap.getNeighboringCells(gameMap.locateUnit(u), i);
+            for (MapCell tmpmc : neighbors) {
+                if (!attackable.contains(tmpmc)) {
+                    attackable.add(tmpmc);
+                }
+            }
+        }
+
+        if(attackable.contains(target)){
+            return true;
+        }
+        return false;
     }
 
     public ArrayList<MapCell> actionableMCs(Unit unit){
