@@ -520,4 +520,9 @@ public class Unit implements Serializable, Comparable<Unit> {
         String oString = o.getTypeName() + o.getCharName();
         return curString.compareTo(oString);
     }
+
+    @Override
+    public String toString() {
+        return typeName + " --- " + charName;
+    }
 }

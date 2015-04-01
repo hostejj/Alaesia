@@ -7,6 +7,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
+<?import SPGamePane.ChangeLog?>
 <GridPane fx:id="topGrid" prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="SPGamePane.SPGamePaneController">
     <children>
         <MenuBar prefHeight="25.0" prefWidth="1024.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="0">
@@ -19,9 +20,11 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <ScrollPane fx:id="boardWrap" prefHeight="768.0" prefWidth="824.0" GridPane.columnIndex="0" GridPane.rowSpan="2147483647" GridPane.rowIndex="1">
+        <ScrollPane fx:id="boardWrap" prefHeight="618.0" prefWidth="824.0" GridPane.columnIndex="0" GridPane.rowSpan="1" GridPane.rowIndex="1">
         </ScrollPane>
-        <VBox fx:id="sideBar" prefHeight="768.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
+        <ChangeLog fx:id="changeLog" prefHeight="150.0" prefWidth="824.0" GridPane.columnIndex="0" GridPane.rowSpan="1" GridPane.rowIndex="2">
+        </ChangeLog>
+        <VBox fx:id="sideBar" prefHeight="768.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2">
             <children>
             </children>
         </VBox>

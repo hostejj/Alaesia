@@ -6,7 +6,6 @@ import GameBoard.Tile;
 import GameConcepts.Game;
 import GameConcepts.Player;
 import GameConcepts.Unit;
-import StagingPane.PlayerTab;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -44,6 +43,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     private SPGamePaneController self = this;
     private Unit unitToUse;
 
+    @FXML private ChangeLog changeLog;
     @FXML private ScrollPane boardWrap;
     @FXML private VBox sideBar;
 
@@ -158,6 +158,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     invalidPopup(game.getErrorMessage());
                     game.setErrorFlag(false);
                 } else {
+                    changeLog.setLogText(game.getLogMessage());
                     selectedBoardPaneButton.getUnitImage().setImage(new Image(
                             new File(selectedBoardPaneButton.getUnit().getImageName()).toURI().toString()));
                     game.nextPlayer();
@@ -195,6 +196,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     invalidPopup(game.getErrorMessage());
                     game.setErrorFlag(false);
                 } else {
+                    changeLog.setLogText(game.getLogMessage());
                     sourceBPB.getUnitImage().setImage(null);
                     selectedBoardPaneButton.getUnitImage().setImage(new Image(
                             new File(selectedBoardPaneButton.getUnit().getImageName()).toURI().toString()));
@@ -213,13 +215,16 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     break;
                 } else {
                     //check for two different deaths
+                    changeLog.setLogText(game.getLogMessage());
                     if (game.getCurrentPlayer().getUnitInUse().getCurHP() <= 0) {
                         Tile unitTile = game.getGameMap().locateUnit(game.getCurrentPlayer().getUnitInUse()).getTile();
                         game.unitDeath(game.getCurrentPlayer().getUnitInUse());
+                        changeLog.setLogText(game.getLogMessage());
                         boardPane.getBoardPaneButtons()[unitTile.getX()][unitTile.getY()].getUnitImage().setImage(null);
                     }
                     if (selectedBoardPaneButton.getMapCell().getUnit().getCurHP() <= 0) {
                         game.unitDeath(selectedBoardPaneButton.getMapCell().getUnit());
+                        changeLog.setLogText(game.getLogMessage());
                         selectedBoardPaneButton.getUnitImage().setImage(null);
                     }
                 }
@@ -306,13 +311,20 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     if(game.getGameState() == Game.GameState.PLACEMENTPHASE){
                         Player player = game.getCurrentPlayer();
                         if(game.getCurrentPlayer().makeMove().placeUnit(game)){
+                            changeLog.setLogText(game.getLogMessage());
                             displayPlaceUnit(player);
                         }
                         game.nextPlayer();
                     }
                     else if(game.getGameState() == Game.GameState.BATTLE){
-                        while (game.getCurrentPlayer().makeMove().moveExists()){
-
+                        while ((game.getCurrentPlayer().makeMove().moveExists()) && (game.getGameState() == Game.GameState.BATTLE)){
+                            long startTime = System.nanoTime();
+                            game.getCurrentPlayer().makeMove().chooseMove(game);
+                            long endTime = System.nanoTime();
+                            changeLog.setLogText(game.getLogMessage());
+                            displayActedUnit(game.getCurrentPlayer());
+                            checkDeaths(); // evaulate any deaths that occured
+                            System.err.println("AI turn time: " + (endTime - startTime));
                         }
                         game.nextPlayer();
                     } else if(game.getGameState() == Game.GameState.UNITMOVE){
@@ -387,6 +399,45 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 if(boardPaneButtonY.getTile() == tile){
                     boardPaneButtonY.getUnitImage().setImage(new Image(
                             new File(unit.getImageName()).toURI().toString()));
+                }
+            }
+        }
+    }
+
+    public void displayActedUnit(Player player){
+        Unit unit = player.makeMove().getNeededUnit();
+        MapCell source = player.makeMove().getSourceMapCell();
+        MapCell dest = game.getGameMap().locateUnit(unit);
+        for(BoardPaneButton[] boardPaneButtonX: boardPane.getBoardPaneButtons()){
+            for(BoardPaneButton boardPaneButtonY: boardPaneButtonX){
+                if(boardPaneButtonY.getMapCell() == source){
+                    boardPaneButtonY.getUnitImage().setImage(null);
+                }
+                if(dest != null){
+                    if(boardPaneButtonY.getMapCell() == dest){
+                        boardPaneButtonY.getUnitImage().setImage(new Image(
+                                new File(unit.getImageName()).toURI().toString()));
+                    }
+                }
+            }
+        }
+    }
+
+    public void checkDeaths(){
+        if (game.getCurrentPlayer().makeMove().getNeededUnit().getCurHP() <= 0) {
+            Tile unitTile = game.getGameMap().locateUnit(game.getCurrentPlayer().makeMove().getNeededUnit()).getTile();
+            game.unitDeath(game.getCurrentPlayer().makeMove().getNeededUnit());
+            changeLog.setLogText(game.getLogMessage());
+            boardPane.getBoardPaneButtons()[unitTile.getX()][unitTile.getY()].getUnitImage().setImage(null);
+        }
+        if(game.getCurrentPlayer().makeMove().getNeededMapCell()!=null) {
+            Unit other = game.getCurrentPlayer().makeMove().getNeededMapCell().getUnit();
+            if (other != null) {
+                if (other.getCurHP() <= 0) {
+                    Tile unitTile = game.getGameMap().locateUnit(other).getTile();
+                    game.unitDeath(other);
+                    changeLog.setLogText(game.getLogMessage());
+                    boardPane.getBoardPaneButtons()[unitTile.getX()][unitTile.getY()].getUnitImage().setImage(null);
                 }
             }
         }

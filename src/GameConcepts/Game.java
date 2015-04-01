@@ -17,6 +17,7 @@ public class Game implements Serializable {
     private Integer turnLimit;
 
     private String errorMessage = "";
+    private String logMessage = "";
     private boolean errorFlag = false;
     private final static Integer HITPERCENT = 100;
     private final static Integer CRITDIV = 15;
@@ -183,6 +184,8 @@ public class Game implements Serializable {
             return;
         }
         gameMap.getMapCells()[tile.getX()][tile.getY()].setUnit(unit);
+        logMessage = player.getPlayerName() + " placed " + unit.toString() +
+                " at location " + tile.getX() + ", " + tile.getY() + ".\n";
         if(checkPlacementPhaseOver()) { //determine if the placement phase has ended
             gameState.set(GameState.BATTLE);
         }
@@ -218,6 +221,9 @@ public class Game implements Serializable {
                 MapCell sourceLoc = gameMap.locateUnit(u);
                 sourceLoc.setUnit(null); // remove unit from its last location
                 gameMap.getMapCells()[mapCell.getTile().getX()][mapCell.getTile().getY()].setUnit(u);
+                logMessage = getCurrentPlayer().getPlayerName() + "'s " + u.toString() +
+                        " moved from location " + sourceLoc.getTile().getX() + ", " + sourceLoc.getTile().getY() +
+                        " to " + mapCell.getTile().getX() + ", " + mapCell.getTile().getY() + ".\n";
             }
         }
     }
@@ -246,9 +252,10 @@ public class Game implements Serializable {
         //see if the attack hits the oppenent
         Integer hitChance = u.getACC() - (target.getUnit().getEVA() + target.getTile().getTerrain().getEvaMod());
         if(random.nextInt(HITPERCENT) < hitChance){
+
             //the attack was successful check for a critical hit
             boolean crit = false;
-            if(random.nextInt(HITPERCENT) < hitChance/CRITDIV){
+            if(random.nextInt(HITPERCENT) < (hitChance/CRITDIV)){
                 crit = true;
             }
 
@@ -257,8 +264,14 @@ public class Game implements Serializable {
             if(crit){
                 damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND
                         - MINBOUND) + MINBOUND)/10.0) * CRITMULT.doubleValue())).intValue();
+                logMessage = getCurrentPlayer().getPlayerName() + "'s " + u.toString() +
+                        " critically attacked " + target.getUnit().toString() +
+                        " for " + damage + " damage.\n";
             } else {
                 damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND - MINBOUND) + MINBOUND)/10.0))).intValue();
+                logMessage = getCurrentPlayer().getPlayerName() + "'s " + u.toString() +
+                        " attacked " + target.getUnit().toString() +
+                        " for " + damage + " damage.\n";
             }
 
             target.getUnit().setCurHP(target.getUnit().getCurHP() - damage);
@@ -268,6 +281,9 @@ public class Game implements Serializable {
                 u.addExperience(KILLEXP);
             }
             u.addExperience(HITEXP);
+        } else {
+            logMessage = getCurrentPlayer().getPlayerName() + "'s " + u.toString() +
+                    " attacked and missed.\n";
         }
         u.addExperience(ATTEXP);
 
@@ -292,8 +308,12 @@ public class Game implements Serializable {
                         if(crit){
                             damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND
                                     - MINBOUND) + MINBOUND)/10.0) * CRITMULT.doubleValue())).intValue();
+                            logMessage += findOwner(target.getUnit()).getPlayerName() + "'s " + target.getUnit().toString() +
+                                    " critically retaliated " + u.toString() + " for " + damage + " damage.\n";
                         } else {
                             damage = ((Double) (damage.doubleValue() * ((random.nextInt(MAXBOUND - MINBOUND) + MINBOUND)/10.0))).intValue();
+                            logMessage += findOwner(target.getUnit()).getPlayerName() + "'s " + target.getUnit().toString() +
+                                    " retaliated " + u.toString() + " for " + damage + " damage.\n";
                         }
 
                         u.setCurHP(u.getCurHP() - damage);
@@ -302,6 +322,9 @@ public class Game implements Serializable {
                         }
 
                         target.getUnit().addExperience(HITEXP);
+                    } else{
+                        logMessage += findOwner(target.getUnit()).getPlayerName() + "'s " + target.getUnit().toString() +
+                                " retaliated and missed.\n";
                     }
                     target.getUnit().addExperience(ATTEXP);
                 }
@@ -316,6 +339,8 @@ public class Game implements Serializable {
         owner.removeUnit(unit);
         location.setUnit(null);
 
+        logMessage = owner.getPlayerName() + "'s " + unit.toString() + " died.\n";
+
         if(owner.getArmy().size() == 0){
             playerDeath(owner);
         }
@@ -323,9 +348,11 @@ public class Game implements Serializable {
 
     public void playerDeath(Player player){
         players.remove(player);
+        logMessage += player.getPlayerName() + " has no units left and is out of the game.\n";
 
         if (players.size() == 1){
             winner = players.get(0);
+            logMessage += winner.getPlayerName() + " wins!\n";
             setGameState(GameState.GAMEOVER);
         }
     }
@@ -515,5 +542,13 @@ public class Game implements Serializable {
             }
         }
         return -1; //error
+    }
+
+    public String getLogMessage() {
+        return logMessage;
+    }
+
+    public void setLogMessage(String logMessage) {
+        this.logMessage = logMessage;
     }
 }

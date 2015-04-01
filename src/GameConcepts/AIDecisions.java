@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class AIDecisions implements Serializable{
+    private MapCell sourceMapCell;
     private Unit neededUnit;
     private Tile neededTile;
     private MapCell neededMapCell;
@@ -76,9 +77,11 @@ public class AIDecisions implements Serializable{
         neededMapCell = null;
         neededTile = null;
         neededUnit = null;
+        sourceMapCell = null;
         ArrayList<Unit> availableUnits = getActionableUnits();
         if(unitKillable(game, availableUnits)){
             owner.setUnitInUse(neededUnit);
+            neededUnit.setCurACT(neededUnit.getCurACT() - 1);
             owner.useTurnPoints(neededUnit.getCPA());
             if(game.inAttackRange(neededMapCell, game.getGameMap().locateUnit(neededUnit), neededUnit)){
                 game.attackUnit(game.getGameMap().getMapCells()[neededTile.getX()][neededTile.getY()]);
@@ -91,6 +94,7 @@ public class AIDecisions implements Serializable{
         }
         else if(freeAttack(game, availableUnits)){
             owner.setUnitInUse(neededUnit);
+            neededUnit.setCurACT(neededUnit.getCurACT() - 1);
             owner.useTurnPoints(neededUnit.getCPA());
 
             MapCell setupMoveCell = preAttackMoveCell(game);
@@ -103,6 +107,7 @@ public class AIDecisions implements Serializable{
         }
         else if(standardAttack(game, availableUnits)){
             owner.setUnitInUse(neededUnit);
+            neededUnit.setCurACT(neededUnit.getCurACT() - 1);
             owner.useTurnPoints(neededUnit.getCPA());
             if(game.inAttackRange(neededMapCell, game.getGameMap().locateUnit(neededUnit), neededUnit)){
                 game.attackUnit(game.getGameMap().getMapCells()[neededTile.getX()][neededTile.getY()]);
@@ -115,15 +120,21 @@ public class AIDecisions implements Serializable{
         }
         else if(moveForward(game, availableUnits)){
             owner.setUnitInUse(neededUnit);
+            neededUnit.setCurACT(neededUnit.getCurACT() - 1);
             owner.useTurnPoints(neededUnit.getCPA());
             game.moveUnit(neededMapCell);
             owner.setUnitInUse(null);
         }
         else if(runAway(game, availableUnits)){
-
+            owner.setUnitInUse(neededUnit);
+            neededUnit.setCurACT(neededUnit.getCurACT() - 1);
+            owner.useTurnPoints(neededUnit.getCPA());
+            game.moveUnit(neededMapCell);
+            owner.setUnitInUse(null);
         }
         else {
             //no good moves pass the turn;
+            game.setLogMessage("");
             owner.setTurnPoints(0);
         }
     }
@@ -146,11 +157,13 @@ public class AIDecisions implements Serializable{
                         neededUnit = attacker;
                         neededTile = defenderTile;
                         neededMapCell = game.getGameMap().getMapCells()[neededTile.getX()][neededTile.getY()];
+                        sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                     } else {
                         if(attacker.getCurHP() >= neededUnit.getCurHP()){
                             neededUnit = attacker;
                             neededTile = defenderTile;
                             neededMapCell = game.getGameMap().getMapCells()[neededTile.getX()][neededTile.getY()];
+                            sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                         }
                     }
                     break;
@@ -185,12 +198,14 @@ public class AIDecisions implements Serializable{
                             neededUnit = attacker;
                             neededMapCell = game.getGameMap().locateUnit(defender);
                             neededTile = neededMapCell.getTile();
+                            sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                             break;
                         } else {
                             if(attacker.getCurHP() > neededUnit.getCurHP()){
                                 neededUnit = attacker;
                                 neededMapCell = game.getGameMap().locateUnit(defender);
                                 neededTile = neededMapCell.getTile();
+                                sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                                 break;
                             }
                         }
@@ -230,14 +245,17 @@ public class AIDecisions implements Serializable{
                     neededUnit = attacker;
                     neededMapCell = game.getGameMap().locateUnit(defender);
                     neededTile = neededMapCell.getTile();
+                    sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                 } else if(defender.getCurHP() < neededMapCell.getUnit().getCurHP()){
                     neededUnit = attacker;
                     neededMapCell = game.getGameMap().locateUnit(defender);
                     neededTile = neededMapCell.getTile();
+                    sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                 } else if((attacker.getCurHP() > neededUnit.getCurHP()) && (neededMapCell == game.getGameMap().locateUnit(defender))){
                     neededUnit = attacker;
                     neededMapCell = game.getGameMap().locateUnit(defender);
                     neededTile = neededMapCell.getTile();
+                    sourceMapCell = game.getGameMap().locateUnit(neededUnit);
                 }
             }
         }
@@ -249,6 +267,7 @@ public class AIDecisions implements Serializable{
 
     /**
      * Determines if a unit should move towards enemy units.
+     * ***Movement is currently not working properly, units tend to move up on the map first then towards and back down.
      * @param game The game that the AI bases its decision on.
      * @param availableUnits A list of units that are able to move.
      * @return True if movement is recommended, false otherwise.
@@ -259,25 +278,33 @@ public class AIDecisions implements Serializable{
         Unit closestEnemy = null;
         MapCell closestEnemyLocation = null;
         Integer closestEnemyXY = Integer.MAX_VALUE; // initialize to a large value
+        Integer closestEnemyXYdif = Integer.MAX_VALUE;
         MapCell enemyLocation;
         Integer enemyXY;
+        Integer enemyXYdif;
         Unit closestUnit = null;
         MapCell closestUnitLocation;
         Integer closestUnitXY = 0;
+        Integer closestUnitXYdif = 0;
         MapCell unitLocation;
         Integer unitXY;
+        Integer unitXYdif;
         MapCell targetLocation = null;
         Integer targetXY = 0;
+        Integer targetXYdif = 0;
         Integer currentXY = 0;
+        Integer currentXYdif = 0;
 
         for(Unit unit: availableUnits){
             if(closestUnit == null){
                 closestUnit = unit;
                 closestUnitLocation = game.getGameMap().locateUnit(closestUnit);
                 closestUnitXY = closestUnitLocation.getTile().getX() + closestUnitLocation.getTile().getY();
+                closestUnitXYdif = closestUnitLocation.getTile().getX() - closestUnitLocation.getTile().getY();
             }
             unitLocation = game.getGameMap().locateUnit(unit);
             unitXY = unitLocation.getTile().getX() + unitLocation.getTile().getY();
+            unitXYdif = unitLocation.getTile().getX() - unitLocation.getTile().getY();
             for (Player player: game.getPlayers()){
                 if(player != owner){
                     for(Unit enemy: player.getArmy()){
@@ -285,16 +312,21 @@ public class AIDecisions implements Serializable{
                             closestEnemy = enemy;
                             closestEnemyLocation = game.getGameMap().locateUnit(closestEnemy);
                             closestEnemyXY = closestEnemyLocation.getTile().getX() + closestEnemyLocation.getTile().getY();
+                            closestEnemyXYdif = closestEnemyLocation.getTile().getX() - closestEnemyLocation.getTile().getY();
                         }
                         enemyLocation = game.getGameMap().locateUnit(enemy);
                         enemyXY = enemyLocation.getTile().getX() + enemyLocation.getTile().getY();
-                        if(Math.abs(enemyXY - unitXY) < Math.abs(closestEnemyXY - closestUnitXY)){
+                        enemyXYdif = enemyLocation.getTile().getX() - enemyLocation.getTile().getY();
+                        if((Math.abs(enemyXY - unitXY) + Math.abs(enemyXYdif - unitXYdif)) <
+                                (Math.abs(closestEnemyXY - closestUnitXY) + Math.abs(closestEnemyXYdif - closestUnitXYdif))){
                             closestEnemy = enemy;
                             closestEnemyLocation = game.getGameMap().locateUnit(closestEnemy);
                             closestEnemyXY = closestEnemyLocation.getTile().getX() + closestEnemyLocation.getTile().getY();
+                            closestEnemyXYdif = closestEnemyLocation.getTile().getX() - closestEnemyLocation.getTile().getY();
                             closestUnit = unit;
                             closestUnitLocation = game.getGameMap().locateUnit(closestUnit);
                             closestUnitXY = closestUnitLocation.getTile().getX() + closestUnitLocation.getTile().getY();
+                            closestUnitXYdif = closestUnitLocation.getTile().getX() - closestUnitLocation.getTile().getY();
                         }
                     }
                 }
@@ -308,12 +340,15 @@ public class AIDecisions implements Serializable{
                 if(targetLocation == null) {
                     targetLocation = currentLocation;
                     targetXY = targetLocation.getTile().getX() + targetLocation.getTile().getY();
+                    targetXYdif = targetLocation.getTile().getX() - targetLocation.getTile().getY();
                 }
                 currentXY = currentLocation.getTile().getX() + currentLocation.getTile().getY();
-
-                if(Math.abs(closestEnemyXY - currentXY) < Math.abs(closestEnemyXY - targetXY)){
+                currentXYdif = currentLocation.getTile().getX() - currentLocation.getTile().getY();
+                if((Math.abs(closestEnemyXY - currentXY) + Math.abs(closestEnemyXYdif - currentXYdif))
+                        < (Math.abs(closestEnemyXY - targetXY) + Math.abs(closestEnemyXYdif - targetXYdif))){
                     targetLocation = currentLocation;
                     targetXY = currentXY;
+                    targetXYdif = targetLocation.getTile().getX() - targetLocation.getTile().getY();
                 }
             }
         }
@@ -321,6 +356,7 @@ public class AIDecisions implements Serializable{
         if(targetLocation != null){
             neededMapCell = targetLocation;
             neededTile = neededMapCell.getTile();
+            sourceMapCell = game.getGameMap().locateUnit(neededUnit);
             return true;
         }
 
@@ -371,6 +407,7 @@ public class AIDecisions implements Serializable{
                     }
                 }
                 if(safe){
+                    sourceMapCell = game.getGameMap().locateUnit(unit);
                     neededMapCell = possibleEscape;
                     neededTile = possibleEscape.getTile();
                     neededUnit = unit;
@@ -489,5 +526,13 @@ public class AIDecisions implements Serializable{
 
     public Tile getNeededTile() {
         return neededTile;
+    }
+
+    public MapCell getNeededMapCell() {
+        return neededMapCell;
+    }
+
+    public MapCell getSourceMapCell() {
+        return sourceMapCell;
     }
 }
