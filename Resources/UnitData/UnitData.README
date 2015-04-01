@@ -1,0 +1,35 @@
+The unit data files set all of the characteristics for a given unit type. The game will only allow a unit to be part
+of the game if the data file and the image files for a given unit are in the correct locations and formats. The data
+file should be named "UnitType.dat". As an example the Warrior data file is named "Warrior.dat". The format of the
+dat file is newline separated characteristic fields. Below each characteristic is explained in the proper format.
+Recommended value bounds are also given in parenthesis. (Minimum Recommended Value - Maximum Recommended Value).
+Refer to the "Warrior.dat" file as an example for unit creation.
+
+/**** The line below this would be the starting line of a dat file ****/
+Default Name    --- Gives the default name for a unit of this type.
+Type Name       --- Gives the name of the type. This should match the filename.
+Type Cost       --- The amount of army supply this unit costs during unit selection and a general indicator of worth. (2-6)
+Accuracy        --- The likelihood a unit will hit an opponent. (60-100)
+Actions per Turn--- The amount of actions a unit can take in one turn. Using an action does not restore movement. (1-3)
+MP cost per Attack--- The amount  of MP it costs to deal additional damage with an attack. The bonus damage is half the cost. (4-8)
+Cost per Action --- The amount of turn points it takes for a player to activate this unit. (2-6)
+Defense         --- Reduces non-magic damage by the specified amount. (0 - 5)
+Evasion         --- The likelihood a unit will avoid an attack. (0 - 20)
+Experience      --- The amount of experience required by the unit to level up. (20 - 40)
+Hit Points      --- The amount of damage a unit can take before dying. (12 - 20)
+Maximum Level   --- The highest level a unit can obtain. (2-4)
+Movement        --- The distance in tiles that a unit can move. (3-7)
+Magic Points    --- The amount of magical usage a unit has. MP is restored slowly each turn. (0 or 6-12)
+Minimum Range   --- The shortest distance a unit can attack. (1-3)
+Maximum Range   --- The maximum distance a unit can attack. Maximum must be >= the minimum fot the unit to attack. (1-4)
+Retaliations    --- The amount of times a unit can deal damage to its attacker(s) in retaliation per turn. (0-2)
+Strength        --- The amount of damage a unit will deal. (3 - 8)
+Description     --- Provides a description of the unit type, purpose, and history.
+Accuracy on Level--- The increase in a unit's accuracy when it levels up. (3-10)
+Defense on Level--- The increase in a unit's defense when it levels up. (0-2)
+Evasion on Level--- The increase in a unit's evasion when it levels up. (0-9)
+Exp on Level    --- The increase in a unit's experience to reach the following level when it levels up. (8-20)
+HP on Level     --- The increase in a unit's HP when it levels up. (2-6)
+MP on Level     --- The increase in a unit's MP when it levels up. (0 or 2-4)
+Strength on Level--- The increase in a unit's strength when it levels up. (1-3)
+/*** After the last characteristic should be a single newline [ENTER] ***/

@@ -182,6 +182,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                             game.getCurrentPlayer().getTurnPoints().toString() + "/" + game.getMaxTurnPoints()
                     );
                     game.getCurrentPlayer().setUnitInUse(unitToUse);
+                    highlightAvailable(unitToUse);
                     game.getCurrentPlayer().getUnitInUse().setCurACT(game.getCurrentPlayer().getUnitInUse().getCurACT() - 1);
                     game.setGameState(Game.GameState.UNITMOVE);
                 }
@@ -198,6 +199,9 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     selectedBoardPaneButton.getUnitImage().setImage(new Image(
                             new File(selectedBoardPaneButton.getUnit().getImageName()).toURI().toString()));
                     highlightAvailable(selectedBoardPaneButton.getUnit());
+                    if(selectedBoardPaneButton.getUnit().getCurMOV() == 0){
+                        update(END);
+                    }
                 }
                 break;
             case ATTACK:
@@ -221,7 +225,9 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                 }
             case END:
                 game.getCurrentPlayer().setUnitInUse(null);
-                game.setGameState(Game.GameState.BATTLE);
+                if(game.getGameState() != Game.GameState.GAMEOVER) {
+                    game.setGameState(Game.GameState.BATTLE);
+                }
                 break;
             default:
                 break;
@@ -305,6 +311,9 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                         game.nextPlayer();
                     }
                     else if(game.getGameState() == Game.GameState.BATTLE){
+                        while (game.getCurrentPlayer().makeMove().moveExists()){
+
+                        }
                         game.nextPlayer();
                     } else if(game.getGameState() == Game.GameState.UNITMOVE){
                         System.err.println("Error phase");
@@ -331,6 +340,19 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
                     });
                     executorService.submit(computerMoveTask);
                     */
+                } else {
+                    if(game.getGameState() == Game.GameState.PLACEMENTPHASE){
+                        boolean unitsLeft = false;
+                        for(Unit u: game.getCurrentPlayer().getArmy()){
+                            if(game.getGameMap().locateUnit(u) == null){
+                                unitsLeft = true;
+                                break;
+                            }
+                        }
+                        if(!unitsLeft){
+                            game.nextPlayer();
+                        }
+                    }
                 }
             }
         });
@@ -342,16 +364,15 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
             public void changed(ObservableValue<? extends Object> observable,
                                 Object oldValue, Object newValue) {
                 if (game.getGameState() == Game.GameState.PLACEMENTPHASE) {
-
                 } else if (game.getGameState() == Game.GameState.BATTLE) {
-                    hintBox.setHint("Battle Phase: Select a unit to see its available movement. Units can be selected" +
-                            "via the player tabs or the map. Right click-the map and the use button to select the unit" +
-                            "for use");
+                    hintBox.setHint("Battle Phase: Select a unit to see its available movement. Units can be selected " +
+                            "via the player tabs or the map. Right click-the map and the use button to select the unit " +
+                            "for use.");
                     clearHighlights();
                 } else if (game.getGameState() == Game.GameState.UNITMOVE) {
                     hintBox.setHint("Moving Unit: Right click on a highlighted tile and select a choice for the unit.");
                 } else if (game.getGameState() == Game.GameState.GAMEOVER) {
-
+                    hintBox.setHint("Game Over: " + game.getWinner().getPlayerName() + " has won.");
                 }
             }
         });

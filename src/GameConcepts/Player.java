@@ -44,6 +44,10 @@ public class Player implements Serializable{
         return turnPoints;
     }
 
+    public void useTurnPoints(Integer points){
+        turnPoints -= points;
+    }
+
     public void setTurnPoints(Integer turnPoints) {
         this.turnPoints = turnPoints;
     }

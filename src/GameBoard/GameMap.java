@@ -299,12 +299,12 @@ public class GameMap implements Serializable {
         MapCell unitLocation = locateUnit(u);
         Integer unitMovement = u.getCurMOV();
 
-        findShortPathRecurseHelper(shortestPath, tempPath, target, unitLocation, unitMovement);
+        findPathRecurseHelper(shortestPath, tempPath, target, unitLocation, unitMovement);
 
         return shortestPath;
     }
 
-    private void findShortPathRecurseHelper(ArrayList<MapCell> sPath, ArrayList<MapCell> tmpPath,
+    private void findPathRecurseHelper(ArrayList<MapCell> sPath, ArrayList<MapCell> tmpPath,
                                             MapCell target, MapCell source, Integer movement){
         ArrayList<MapCell> neighbors;
 
@@ -328,7 +328,7 @@ public class GameMap implements Serializable {
                             //recurse on the neighbors of the MC
                             tmpPath.add(tmc); // add to the temporary path
                             Integer newMove = movement - (1 + tmc.getTile().getTerrain().getMovMod());
-                            findShortPathRecurseHelper(sPath, tmpPath, target, tmc, newMove);
+                            findPathRecurseHelper(sPath, tmpPath, target, tmc, newMove);
                         }
                     }
                 }

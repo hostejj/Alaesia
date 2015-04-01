@@ -23,7 +23,10 @@ public class Game implements Serializable {
     private final static Double CRITMULT = 1.5;
     private final static Integer MINBOUND = 8;
     private final static Integer MAXBOUND = 12;
-
+    private final static Integer ATTEXP = 1;
+    private final static Integer HITEXP = 2;
+    private final static Integer KILLEXP = 5;
+    private Player winner;
 
     public static enum GameState {
         PLACEMENTPHASE, BATTLE, UNITMOVE, GAMEOVER
@@ -215,7 +218,6 @@ public class Game implements Serializable {
                 MapCell sourceLoc = gameMap.locateUnit(u);
                 sourceLoc.setUnit(null); // remove unit from its last location
                 gameMap.getMapCells()[mapCell.getTile().getX()][mapCell.getTile().getY()].setUnit(u);
-
             }
         }
     }
@@ -263,15 +265,18 @@ public class Game implements Serializable {
 
             if(target.getUnit().getCurHP() <= 0){ //the target died
                 died = true;
+                u.addExperience(KILLEXP);
             }
+            u.addExperience(HITEXP);
         }
+        u.addExperience(ATTEXP);
 
         if(!died){
             //opposing unit can retaliate if within range
             if((target.getUnit().getCurRET() + target.getTile().getTerrain().getRetMod()) > 0){
 
                 //find out if the attacker is in range of defender retaliation
-                if(inAttackRange(gameMap.locateUnit(u), target.getUnit())) {
+                if(inAttackRange(gameMap.locateUnit(u), gameMap.locateUnit(target.getUnit()), target.getUnit())) {
                     target.getUnit().setCurRET(target.getUnit().getCurRET() - 1);
 
                     hitChance = target.getUnit().getACC() - (u.getEVA() + gameMap.locateUnit(u).getTile().getTerrain().getEvaMod());
@@ -292,7 +297,13 @@ public class Game implements Serializable {
                         }
 
                         u.setCurHP(u.getCurHP() - damage);
+                        if(u.getCurHP() <= 0){ //the target died
+                            target.getUnit().addExperience(KILLEXP);
+                        }
+
+                        target.getUnit().addExperience(HITEXP);
                     }
+                    target.getUnit().addExperience(ATTEXP);
                 }
             }
         }
@@ -305,7 +316,18 @@ public class Game implements Serializable {
         owner.removeUnit(unit);
         location.setUnit(null);
 
-        //perhaps check for victory?
+        if(owner.getArmy().size() == 0){
+            playerDeath(owner);
+        }
+    }
+
+    public void playerDeath(Player player){
+        players.remove(player);
+
+        if (players.size() == 1){
+            winner = players.get(0);
+            setGameState(GameState.GAMEOVER);
+        }
     }
 
     public boolean attackValid(MapCell target) {
@@ -328,7 +350,7 @@ public class Game implements Serializable {
                     errorMessage = "Cannot attack because the unit does not have enough movement.";
                     return false;
                 }
-                if (!inAttackRange(target, u)) {
+                if (!inAttackRange(target, gameMap.locateUnit(u), u)) {
                     errorFlag = true;
                     errorMessage = "The selected tile is not in range of being attacked.";
                     return false;
@@ -345,13 +367,14 @@ public class Game implements Serializable {
     /**
      * Determines whether or not a target tile is within the attack range of a unit;
      * @param target The tile to be attacked.
+     * @param source The tile the unit is originating from
      * @param u The unit doing the attacking
      * @return
      */
-    public boolean inAttackRange(MapCell target, Unit u){
+    public boolean inAttackRange(MapCell target, MapCell source, Unit u){
         ArrayList<MapCell> attackable = new ArrayList<MapCell>();
         for (int i = u.getMinRANGE(); i <= u.getMaxRANGE(); i++) {
-            ArrayList<MapCell> neighbors = gameMap.getNeighboringCells(gameMap.locateUnit(u), i);
+            ArrayList<MapCell> neighbors = gameMap.getNeighboringCells(source, i);
             for (MapCell tmpmc : neighbors) {
                 if (!attackable.contains(tmpmc)) {
                     attackable.add(tmpmc);
@@ -363,6 +386,16 @@ public class Game implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public ArrayList<MapCell> moveableMCs(Unit unit){
+        ArrayList<MapCell> moveableMCs = new ArrayList<MapCell>();
+        for(MapCell mc: actionableMCs(unit)){
+            if(mc.getUnit() == null){
+                moveableMCs.add(mc);
+            }
+        }
+        return moveableMCs;
     }
 
     public ArrayList<MapCell> actionableMCs(Unit unit){
@@ -453,6 +486,10 @@ public class Game implements Serializable {
             }
         }
         return true;
+    }
+
+    public Player getWinner() {
+        return winner;
     }
 
     public Integer getTurnLimit() {

@@ -185,18 +185,21 @@ public class SelectionPane extends GridPane {
             byte[] encoded = Files.readAllBytes(Paths.get(fileName));
             String fileData = new String(encoded, Charset.defaultCharset());
             String peeledData = new String(fileData);
+            peeledData = peeledData.replaceAll("\r", ""); // remove any windows carriage returns
+            peeledData = peeledData.replaceAll("\n", ";"); // replace newlines with semicolons for parsing
             {
                 String imageName = fileName.replace(".dat", "Front.png").replace("src/", "").replace("Data", "Images");
                 String charName = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String typeName = peeledData.substring(0,peeledData.indexOf(';'));
-
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String typeCostS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String ACCS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String APTS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String CMPS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String CPAS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
@@ -208,7 +211,7 @@ public class SelectionPane extends GridPane {
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String HPS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
-                String LEVELS = peeledData.substring(0,peeledData.indexOf(';'));
+                String MAXLEVELS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String MOVES = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
@@ -223,16 +226,31 @@ public class SelectionPane extends GridPane {
                 String STRS = peeledData.substring(0,peeledData.indexOf(';'));
                 peeledData = peeledData.substring(peeledData.indexOf(';')+1);
                 String desc = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlACCS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlDEFS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlEVAS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlEXPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlHPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlMPS = peeledData.substring(0,peeledData.indexOf(';'));
+                peeledData = peeledData.substring(peeledData.indexOf(';')+1);
+                String lvlSTRS = peeledData.substring(0,peeledData.indexOf(';'));
                 try {
                     Integer typeCost = Integer.parseInt(typeCostS);
                     Integer acc = Integer.parseInt(ACCS);
                     Integer apt = Integer.parseInt(APTS);
+                    Integer cmp = Integer. parseInt(CMPS);
                     Integer cpa = Integer.parseInt(CPAS);
                     Integer def = Integer.parseInt(DEFS);
                     Integer eva = Integer.parseInt(EVAS);
                     Integer exp = Integer.parseInt(EXPS);
                     Integer hp = Integer.parseInt(HPS);
-                    Integer level = Integer.parseInt(LEVELS);
+                    Integer maxlevel = Integer.parseInt(MAXLEVELS);
                     Integer move = Integer.parseInt(MOVES);
                     Integer mp = Integer.parseInt(MPS);
                     Integer nRange = Integer.parseInt(nRANGES);
@@ -240,8 +258,17 @@ public class SelectionPane extends GridPane {
                     Integer ret = Integer.parseInt(RETS);
                     Integer str = Integer.parseInt(STRS);
 
-                    Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, cpa, def, eva, exp, hp,
-                            level, move, mp, nRange, xRange, ret, str, desc);
+                    Integer lvlACC = Integer.parseInt(lvlACCS);
+                    Integer lvlDEF = Integer.parseInt(lvlDEFS);
+                    Integer lvlEVA = Integer.parseInt(lvlEVAS);
+                    Integer lvlEXP = Integer.parseInt(lvlEXPS);
+                    Integer lvlHP = Integer.parseInt(lvlHPS);
+                    Integer lvlMP = Integer.parseInt(lvlMPS);
+                    Integer lvlSTR = Integer.parseInt(lvlSTRS);
+
+                    Unit u = new Unit(imageName, charName, typeName, typeCost, acc, apt, cmp, cpa, def, eva, exp, hp,
+                            maxlevel, move, mp, nRange, xRange, ret, str, desc ,lvlACC, lvlDEF, lvlEVA, lvlEXP,
+                            lvlHP, lvlMP, lvlSTR);
                     SelectionPaneUnitButton selectionPaneUnitButton = new SelectionPaneUnitButton(u, this);
                     units.add(selectionPaneUnitButton);
                 } catch (NumberFormatException nfe){
