@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.GridPane?>
+<?import MultiplayerSetup.PlayerSelPane?>
+<?import MultiplayerSetup.ChatPane?>
+<?import MultiplayerSetup.MPMapSelectionPane?>
+<?import MultiplayerSetup.MPOptionsPane?>
+<?import MultiplayerSetup.MPSelectionPane?>
+<?import MultiplayerSetup.MPPlayerPane?>
+<?import javafx.scene.layout.VBox?>
+<GridPane fx:id="topGrid" prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="MultiplayerSetup.MPStagingController">
+    <children>
+        <PlayerSelPane fx:id="playerSelPane" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ChatPane fx:id="chatPane" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <VBox GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.rowSpan="2">
+            <children>
+                <MPMapSelectionPane fx:id="mpMapSelectionPane"/>
+                <MPOptionsPane fx:id="mpOptionsPane" />
+                <MPSelectionPane fx:id="mpSelectionPane" />
+                <MPPlayerPane fx:id="mpPlayerPane"/>
+            </children>
+        </VBox>
+    </children>
+</GridPane>

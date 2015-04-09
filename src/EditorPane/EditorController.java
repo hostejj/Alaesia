@@ -30,6 +30,7 @@ public class EditorController implements Initializable, BoardPaneObserver {
     @FXML private ToolPane toolPane;
     @FXML private TileListPane tileListPane;
     private ArrayList<GameMap> openMaps = new ArrayList<GameMap>();
+    private TransferModel transferModel = new TransferModel();
 
     //Tool buttons and information
     private Integer tool = 0; //The tool state is represented by an integer.
@@ -73,6 +74,8 @@ public class EditorController implements Initializable, BoardPaneObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        transferModel.getTransferModel().setEditorController(this);
+
         //register as and observer
         tileListPane.register(this);
         toolPane.register(this);

@@ -48,6 +48,9 @@ public class Game implements Serializable {
             players.get(i).setTurnPoints(maxTurnPoints);
             players.get(i).setMaxTurnPoints(maxTurnPoints);
         }
+
+        this.currentPlayer = new ReadOnlyObjectWrapper<Player>(this, "currentPlayer", players.get(0));
+        this.gameState = new ReadOnlyObjectWrapper<GameState>(this, "gameState", GameState.PLACEMENTPHASE);
     }
 
     public ArrayList<Player> getPlayers() {
@@ -75,11 +78,6 @@ public class Game implements Serializable {
             }
         }
         return null;
-    }
-
-    public void setPropertiesOnLoad(){
-        this.currentPlayer = new ReadOnlyObjectWrapper<Player>(this, "currentPlayer", players.get(0));
-        this.gameState = new ReadOnlyObjectWrapper<GameState>(this, "gameState", GameState.PLACEMENTPHASE);
     }
 
     /**

@@ -1,6 +1,7 @@
 package StagingPane;
 
 import GUIs.Navigator;
+import GUIs.TransferModel;
 import GameBoard.GameMap;
 import GameConcepts.Game;
 import GameConcepts.Unit;
@@ -31,6 +32,7 @@ public class StagingController implements Initializable{
     @FXML private SelectionPane selectionPane;
     @FXML private MapSelectionPane mapSelPane;
     @FXML private PlayerPane playerPane;
+    private TransferModel transferModel = new TransferModel();
     public static Integer BACK = 0;
     public static Integer SEL = 1;
     public static Integer START = 2;
@@ -41,6 +43,7 @@ public class StagingController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
+        transferModel.getTransferModel().setStagingController(this);
         optionsPane.register(this);
         selectionPane.register(this);
         mapSelPane.register(this);
@@ -61,7 +64,6 @@ public class StagingController implements Initializable{
             }
         } else if (choice == START){
             if(startValid()){
-                saveStart();
                 Navigator.loadScene(Navigator.SPGAME);
             }
         } else if (choice == ADD){
@@ -155,25 +157,6 @@ public class StagingController implements Initializable{
         popup.setScene(scene);
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.show();
-    }
-
-    /**
-     * Saves the data for the setup game into a temp file. This
-     * file is loaded into the game scene upon initialization.
-     */
-    public void saveStart(){
-        populateGameData();
-        try{
-            File temp = new File("startTemp.gam");
-            FileOutputStream fileOut = new FileOutputStream("Resources/" + temp);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-
-            out.writeObject(game);
-            out.close();
-            fileOut.close();
-        } catch (IOException ioe){
-            ioe.printStackTrace();
-        }
     }
 
     /**

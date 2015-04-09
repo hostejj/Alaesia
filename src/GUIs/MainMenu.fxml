@@ -16,12 +16,12 @@
         GridPane.columnIndex="2" GridPane.rowIndex="1">
         <Button text="Single Player"
                 onAction="#handleSinglePlayerButtonAction"/>
-        <Button text="Multiplayer"
-                onAction="#handleMultiplayerButtonAction"/>
+        <Button text="Host Game"
+                onAction="#handleHostButtonAction"/>
+        <Button text="Join Game"
+                onAction="#handleJoinButtonAction"/>
         <Button text="Scenario Editor"
                 onAction="#handleEditorButtonAction"/>
-        <Button text="Preferences"
-                onAction="#handlePreferencesButtonAction"/>
         <Button text="Exit"
                 onAction="#handleExitButtonAction"/>
     </VBox>

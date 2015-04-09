@@ -1,20 +1,30 @@
 package GUIs;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
 
 public class PrimaryPane extends Application {
+    private TransferModel transferModel = new TransferModel();
 
     @Override
     public void start(Stage stage) throws Exception{
         stage.setTitle("Alaesia");
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Platform.exit();
+            }
+        });
 
         //setup game icon
         try {
@@ -30,6 +40,19 @@ public class PrimaryPane extends Application {
         );
 
         stage.show();
+    }
+
+    @Override
+    public void stop(){
+        //clean up any open connections on the close
+        if(transferModel.getTransferModel().getHostController() != null){
+            if(transferModel.getTransferModel().getHostController().getHostServer() != null) {
+                transferModel.getTransferModel().getHostController().endHost();
+            }
+        }
+        if(transferModel.getTransferModel().getJoinController() != null){
+            transferModel.getTransferModel().getJoinController().endConnection();
+        }
     }
 
     /**

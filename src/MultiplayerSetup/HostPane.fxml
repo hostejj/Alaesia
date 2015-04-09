@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<GridPane fx:id="topGrid" prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="MultiplayerSetup.HostController">
+    <children>
+        <Label text="Port" GridPane.columnIndex="0" GridPane.rowIndex="0"></Label>
+        <Label text ="Name" GridPane.columnIndex="1" GridPane.rowIndex="0"></Label>
+        <TextField fx:id="portField" text="46460" GridPane.columnIndex="0" GridPane.rowIndex="1"></TextField>
+        <TextField fx:id="nameField" text="J$." GridPane.columnIndex="1" GridPane.rowIndex="1"></TextField>
+        <Button text="Open Room" GridPane.columnIndex="0" GridPane.rowIndex="2" onAction="#handleAccept"></Button>
+        <Button text="Back" GridPane.columnIndex="1" GridPane.rowIndex="2" onAction="#handleBack"></Button>
+    </children>
+</GridPane>

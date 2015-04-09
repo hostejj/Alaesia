@@ -17,7 +17,10 @@ public class Navigator {
      * Convenience constants for fxml layouts managed by the navigator.
      */
     public static final String EDITOR = "../EditorPane/EditorPane.fxml";
+    public static final String HOST = "../MultiplayerSetup/HostPane.fxml";
+    public static final String JOIN = "../MultiplayerSetup/JoinPane.fxml";
     public static final String MAINMENU = "MainMenu.fxml";
+    public static final String MPSTAGE = "../MultiplayerSetup/MPStagingPane.fxml";
     public static final String PRIMARY = "PrimaryPane.fxml";
     public static final String STAGING = "../StagingPane/StagingPane.fxml";
     public static final String SPGAME = "../SPGamePane/SPGamePane.fxml";

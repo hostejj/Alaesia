@@ -39,6 +39,7 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
     private Game game;
     private BoardPane boardPane;
     private BoardPaneButton selectedBoardPaneButton;
+    private TransferModel transferModel = new TransferModel();
     private final String SHADENAME = "Resources/InterfaceImages/pshade";
     private SPGamePaneController self = this;
     private Unit unitToUse;
@@ -65,7 +66,8 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
-        loadGameData(); //loads the data for the game generated in the Staging Pane
+        transferModel.getTransferModel().setSpGamePaneController(this);
+        game = transferModel.getTransferModel().getStagingController().getGame();
         setupComps();
         createSideBar();
         drawBoard();
@@ -79,23 +81,6 @@ public class SPGamePaneController implements Initializable, BoardPaneObserver {
 
     public void handleExitAlaesia(ActionEvent actionEvent) {
         Platform.exit();
-    }
-
-    public void loadGameData(){
-        try{
-            File temp = new File("Resources/startTemp.gam");
-            FileInputStream fileIn = new FileInputStream(temp);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            game = (Game) in.readObject();
-            in.close();
-            fileIn.close();
-
-            game.setPropertiesOnLoad();
-        } catch (ClassNotFoundException cnfe){
-            cnfe.printStackTrace();
-        } catch (IOException ioe){
-            ioe.printStackTrace();
-        }
     }
 
     public void drawBoard(){
