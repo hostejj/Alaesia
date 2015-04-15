@@ -5,16 +5,36 @@ import GameConcepts.Unit;
 import java.io.Serializable;
 
 public class MapCell implements Serializable{
-    Tile tile;
-    Unit unit; // may or may not be null
+    private Tile tile;
+    private Unit unit; // may or may not be null
+    private String div = "#";
 
     public MapCell(Tile tile) {
         this.tile = tile;
+        this.unit = null;
     }
 
     public MapCell(Tile tile, Unit unit) {
         this.tile = tile;
         this.unit = unit;
+    }
+
+    public MapCell(String mapCellString){
+        String peeledData = mapCellString;
+        String data;
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            tile = new Tile(data);
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            if(data != "null") {
+                unit = new Unit(data);
+            } else {
+                unit = null;
+            }
+        }
     }
 
     public Tile getTile() {
@@ -59,5 +79,18 @@ public class MapCell implements Serializable{
         int result = tile.hashCode();
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         return result;
+    }
+
+    public String buildString(){
+        String mapCellString = "";
+        mapCellString += tile.buildString() + div;
+
+        if(unit != null) {
+            mapCellString += unit.buildString() + div;
+        } else {
+            mapCellString += "null" + div;
+        }
+
+        return mapCellString;
     }
 }

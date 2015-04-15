@@ -15,8 +15,9 @@ public class ClientServer implements Runnable {
     private int beatsSent = 0;
     private boolean closeSent = false;
     private volatile boolean running = true;
-    public enum COMMANDS {CHAT, HBEATS, HBEATR, JOINROOM, PLAYCHNG, CLOSE}
+    public enum COMMANDS {ADDUNIT, CHAT, CLOSE, HBEATS, HBEATR, JOINROOM, MAPSEL, PLAYCHNG, RMALL, RMUNIT }
     private ArrayList<String> dataBuffer = new ArrayList<String>();
+    private final static String transferDiv = "*";
 
 
     public ClientServer(Socket client, HostServer hostServer){
@@ -98,35 +99,56 @@ public class ClientServer implements Runnable {
 
     public void addBufferData(COMMANDS command, String data){
         if((command != null) && (data != null)){
-            if(COMMANDS.CHAT == command) {
+            if(COMMANDS.ADDUNIT == command) {
                 synchronized (dataBuffer) {
-                    dataBuffer.add("CHAT^" + data);
+                    dataBuffer.add("ADDUNIT" + transferDiv + data);
                 }
-            } else if(COMMANDS.HBEATS == command) {
+            } else if(COMMANDS.CHAT == command) {
                 synchronized (dataBuffer) {
-                    dataBuffer.add("HBEATS^" + data);
-                }
-            } else if(COMMANDS.HBEATR == command) {
-                synchronized (dataBuffer) {
-                    dataBuffer.add(0, "HBEATR^" + data); // add to the front
-                }
-            } else if(COMMANDS.PLAYCHNG == command){
-                synchronized (dataBuffer){
-                    dataBuffer.add(0, "PLAYCHNG^" + data);
+                    dataBuffer.add("CHAT" + transferDiv + data);
                 }
             } else if(COMMANDS.CLOSE == command){
                 synchronized (dataBuffer){
-                    dataBuffer.add(0, "CLOSE^" + data);
+                    dataBuffer.add(0, "CLOSE" + transferDiv + data);
+                }
+            } else if(COMMANDS.HBEATS == command) {
+                synchronized (dataBuffer) {
+                    dataBuffer.add("HBEATS" + transferDiv + data);
+                }
+            } else if(COMMANDS.HBEATR == command) {
+                synchronized (dataBuffer) {
+                    dataBuffer.add(0, "HBEATR" + transferDiv + data); // add to the front
+                }
+            } else if(COMMANDS.MAPSEL == command){
+                synchronized (dataBuffer){
+                    dataBuffer.add("MAPSEL" + transferDiv + data);
+                }
+            } else if(COMMANDS.PLAYCHNG == command){
+                synchronized (dataBuffer){
+                    dataBuffer.add("PLAYCHNG" + transferDiv + data);
+                }
+            } else if(COMMANDS.RMALL == command){
+                synchronized (dataBuffer){
+                    dataBuffer.add(0, "RMALL" + transferDiv + data);
+                }
+            }
+            else if(COMMANDS.RMUNIT == command){
+                synchronized (dataBuffer){
+                    dataBuffer.add("RMUNIT" + transferDiv + data);
                 }
             }
         }
     }
 
     public void update(String data) {
-        String peelCommand = data.substring(0, data.indexOf("^"));
-        data = data.substring(data.indexOf("^") + 1, data.length());
-        if (peelCommand.equals("CHAT")) {
+        String peelCommand = data.substring(0, data.indexOf(transferDiv));
+        data = data.substring(data.indexOf(transferDiv) + 1, data.length());
+        if (peelCommand.equals("ADDUNIT")) {
+            observer.serverUpdate(COMMANDS.ADDUNIT, data, this);
+        } else if (peelCommand.equals("CHAT")) {
             observer.serverUpdate(COMMANDS.CHAT, data, this);
+        } else if (peelCommand.equals("CLOSE")){
+            observer.serverUpdate(COMMANDS.CLOSE, data, this);
         } else if (peelCommand.equals("HBEATS")) {
             addBufferData(COMMANDS.HBEATR, ((Integer) dataBuffer.size()).toString());
         } else if (peelCommand.equals("HBEATR")) {
@@ -135,8 +157,10 @@ public class ClientServer implements Runnable {
             observer.serverUpdate(COMMANDS.HBEATR, data, this);
         } else if (peelCommand.equals("JOINROOM")){
             observer.serverUpdate(COMMANDS.JOINROOM, data, this);
-        } else if (peelCommand.equals("CLOSE")){
-            observer.serverUpdate(COMMANDS.CLOSE, data, this);
+        } else if (peelCommand.equals("RMALL")){
+            observer.serverUpdate(COMMANDS.RMALL, data, this);
+        } else if (peelCommand.equals("RMUNIT")){
+            observer.serverUpdate(COMMANDS.RMUNIT, data, this);
         }
     }
 

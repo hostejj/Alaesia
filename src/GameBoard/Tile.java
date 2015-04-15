@@ -7,6 +7,7 @@ public class Tile implements Serializable {
 
     private Terrain terrain;
     private String imageName;
+    private String div = "@";
 
     private Integer x;
     private Integer y;
@@ -30,6 +31,38 @@ public class Tile implements Serializable {
         this.terrain = terrain;
         this.x = x;
         this.y = y;
+    }
+
+    public Tile(String tileString){
+        String peeledData = tileString;
+        String data;
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            imageName = data;
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                x = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                y = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData;
+            terrain = new Terrain(data);
+        }
     }
 
     public Tile(Tile t){
@@ -86,12 +119,18 @@ public class Tile implements Serializable {
         return result;
     }
 
+    public String buildString() {
+        return imageName + div + x + div + y + div + terrain.buildString();
+    }
+
     @Override
     public String toString() {
         return "Tile{" +
+                "DEFAULTTILEDIR='" + DEFAULTTILEDIR + '\'' +
+                ", terrain=" + terrain +
                 ", imageName='" + imageName + '\'' +
                 ", x=" + x +
                 ", y=" + y +
-                "}\n\t" + terrain.toString();
+                '}';
     }
 }

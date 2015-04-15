@@ -21,8 +21,9 @@ public class ClientConnection implements Runnable {
     private int beatSent = 0;
     private boolean closeSent = false;
     private volatile boolean running = true;
-    public enum COMMANDS {CHAT, HBEATS, HBEATR, JOINROOM, PLAYCHNG, CLOSE}
+    public enum COMMANDS {ADDUNIT, CHAT, CLOSE, HBEATS, HBEATR, JOINROOM, MAPSEL, PLAYCHNG, RMALL, RMUNIT }
     private ArrayList<String> dataBuffer = new ArrayList<String>();
+    private final static String transferDiv = "*";
 
     public ClientConnection(String IP, Integer port, JoinController joinController){
         this.observer = joinController;
@@ -111,45 +112,65 @@ public class ClientConnection implements Runnable {
 
     public void addBufferData(COMMANDS command, String data){
         if((command != null) && (data != null)) {
-            if (COMMANDS.CHAT == command) {
+            if (COMMANDS.ADDUNIT == command) {
                 synchronized (dataBuffer) {
-                    dataBuffer.add("CHAT^" + data);
+                    dataBuffer.add("ADDUNIT" + transferDiv + data);
                 }
-            } else if (COMMANDS.HBEATS == command) {
+            } else if (COMMANDS.CHAT == command) {
                 synchronized (dataBuffer) {
-                    dataBuffer.add("HBEATS^" + data);
-                }
-            } else if (COMMANDS.HBEATR == command) {
-                synchronized (dataBuffer) {
-                    dataBuffer.add(0, "HBEATR^" + data); // add to the front
-                }
-            } else if (COMMANDS.JOINROOM == command){
-                synchronized (dataBuffer) {
-                    dataBuffer.add(0, "JOINROOM^" + data); // add to the front
+                    dataBuffer.add("CHAT" + transferDiv + data);
                 }
             } else if(COMMANDS.CLOSE == command){
                 synchronized (dataBuffer){
-                    dataBuffer.add(0, "CLOSE^" + data);
+                    dataBuffer.add(0, "CLOSE" + transferDiv + data);
+                }
+            } else if (COMMANDS.HBEATS == command) {
+                synchronized (dataBuffer) {
+                    dataBuffer.add("HBEATS" + transferDiv + data);
+                }
+            } else if (COMMANDS.HBEATR == command) {
+                synchronized (dataBuffer) {
+                    dataBuffer.add(0, "HBEATR" + transferDiv + data); // add to the front
+                }
+            } else if (COMMANDS.JOINROOM == command) {
+                synchronized (dataBuffer) {
+                    dataBuffer.add(0, "JOINROOM" + transferDiv + data); // add to the front
+                }
+            } else if (COMMANDS.RMALL == command){
+                synchronized (dataBuffer) {
+                    dataBuffer.add(0, "RMALL" + transferDiv + data); // add to the front
+                }
+            } else if (COMMANDS.RMUNIT == command){
+                synchronized (dataBuffer) {
+                    dataBuffer.add("RMUNIT" + transferDiv + data); // add to the front
                 }
             }
         }
     }
 
     public void update(String data){
-        String peelCommand =  data.substring(0, data.indexOf("^"));
-        data = data.substring(data.indexOf("^") + 1, data.length());
-        if (peelCommand.equals("CHAT")) {
+        String peelCommand =  data.substring(0, data.indexOf(transferDiv));
+        data = data.substring(data.indexOf(transferDiv) + 1, data.length());
+        if (peelCommand.equals("ADDUNIT")) {
+            observer.clientUpdate(COMMANDS.ADDUNIT, data);
+        } if (peelCommand.equals("CHAT")) {
             observer.clientUpdate(COMMANDS.CHAT, data);
+        } else if (peelCommand.equals("CLOSE")){
+            observer.clientUpdate(COMMANDS.CLOSE, data);
         } else if (peelCommand.equals("HBEATS")){
             addBufferData(COMMANDS.HBEATR, ((Integer) dataBuffer.size()).toString());
         } else if (peelCommand.equals("HBEATR")){
             beatSent = 0;
             lastHBeat = System.currentTimeMillis(); //received heartbeat so update the time
             observer.clientUpdate(COMMANDS.HBEATR, data);
+        } else if (peelCommand.equals("MAPSEL")) {
+            observer.clientUpdate(COMMANDS.MAPSEL, data);
         } else if (peelCommand.equals("PLAYCHNG")) {
             observer.clientUpdate(COMMANDS.PLAYCHNG, data);
-        } else if (peelCommand.equals("CLOSE")){
-            observer.clientUpdate(COMMANDS.CLOSE, data);
+        } else if (peelCommand.equals("RMALL")) {
+            observer.clientUpdate(COMMANDS.RMALL, data);
+        } else if (peelCommand.equals("RMUNIT")) {
+            observer.clientUpdate(COMMANDS.RMUNIT, data);
         }
     }
 

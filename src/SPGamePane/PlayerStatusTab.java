@@ -61,7 +61,7 @@ public class PlayerStatusTab extends Tab{
                     protected void updateItem(Unit item, boolean empty) {
                         super.updateItem(item, empty);
                         if(item != null){
-                            setText(item.getTypeName() + " --- " + item.getCharName());
+                            setText(item.toString());
                         }
                     }
                 };

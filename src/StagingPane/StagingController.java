@@ -64,6 +64,7 @@ public class StagingController implements Initializable{
             }
         } else if (choice == START){
             if(startValid()){
+                populateGameData();
                 Navigator.loadScene(Navigator.SPGAME);
             }
         } else if (choice == ADD){

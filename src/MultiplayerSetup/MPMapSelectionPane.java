@@ -1,14 +1,16 @@
 package MultiplayerSetup;
 
+import GUIs.BoardPane;
 import GameBoard.GameMap;
+import GameConcepts.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+
+import java.io.*;
 import java.util.ArrayList;
 
 public class MPMapSelectionPane extends GridPane {
@@ -85,6 +87,54 @@ public class MPMapSelectionPane extends GridPane {
             System.err.println(e.toString());
         }
 
+    }
+
+    public void setMapData(GameMap gameMap){
+        currentMapSel = gameMap;
+        removeCurrentMapData();
+
+        numPlayers.setText(((Integer) gameMap.getMaxPlayers()).toString());
+        for (int i = 0; i < gameMap.getMaxPlayers(); i++){
+            Integer playerNum = i + 1;
+            playerSLL.add(new Label("Player " + playerNum.toString() + " Starting Locations: "));
+            playerSL.add(new Label(((Integer) gameMap.getStartLocs().get(i).size()).toString()));
+
+
+            add(playerSLL.get(i), 0, 3 + i);
+            add(playerSL.get(i), 1, 3+i);
+        }
+        size.setText(((Integer) gameMap.getWidth()).toString() + ", " + ((Integer) gameMap.getHeight()).toString());
+        mapSelector.setValue(gameMap.getMapName());
+    }
+
+    public boolean mapExists(GameMap gameMap){
+        String fileName = MAPDIRNAME + gameMap.getMapName() + ".amap";
+        File dir = new File(MAPDIRNAME);
+        if(dir.isDirectory()){
+            File[] directoryListing = dir.listFiles();
+            for (File child : directoryListing) {
+                if(child.getName().equals(fileName)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void saveMap(GameMap gameMap){
+        String fileName = gameMap.getMapName() + ".amap";
+        try{
+            File mapFile = new File(fileName);
+            FileOutputStream fileOut = new FileOutputStream(MAPDIRNAME + mapFile);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
+            out.writeObject(gameMap);
+            out.close();
+            fileOut.close();
+
+        } catch (IOException ioe){
+            ioe.printStackTrace();
+        }
     }
 
     public void removeCurrentMapData(){

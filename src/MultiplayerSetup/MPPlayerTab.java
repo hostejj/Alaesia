@@ -62,6 +62,7 @@ public class MPPlayerTab extends Tab {
 
     private Button removeUnit = new Button("Remove Unit");
     private Button generateRND = new Button("Generate Army");
+    private boolean addPrivilege = false;
 
     public MPPlayerTab(String playerName, MPPlayerPane mpPlayerPane, Integer maxUnits){
         register(mpPlayerPane);
@@ -145,13 +146,16 @@ public class MPPlayerTab extends Tab {
             }
         });
 
+        removeUnit.setDisable(true);
         removeUnit.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                observer.getObserver().update(observer.getObserver().REMOVEUNIT);
                 removeSelectedUnit();
             }
         });
 
+        generateRND.setDisable(true);
         generateRND.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -221,11 +225,29 @@ public class MPPlayerTab extends Tab {
         return unitObserv;
     }
 
+    public void setupPrivileges(){
+        removeUnit.setDisable(false);
+        generateRND.setDisable(false);
+        addPrivilege = true;
+    }
+
+    public boolean hasAddPrivilege() {
+        return addPrivilege;
+    }
+
     public Integer getMaxUnits() {
         return maxUnits;
     }
 
     public void register(MPPlayerPane mpPlayerPane){
         this.observer = mpPlayerPane;
+    }
+
+    public void setSelectedUnit(Unit unit){
+        for (Unit u : getUnitsList()){
+            if(u.equals(unit)){
+                this.selectedUnit = u;
+            }
+        }
     }
 }

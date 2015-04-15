@@ -11,6 +11,7 @@ public class Unit implements Serializable, Comparable<Unit> {
     private String imageName;
     private String charName;
     private String typeName;
+    private String DESC;
     private Integer typeVal;
     private Integer ACC;
     private Integer APT;
@@ -27,7 +28,6 @@ public class Unit implements Serializable, Comparable<Unit> {
     private Integer maxRANGE;
     private Integer RET;
     private Integer STR;
-    private String DESC;
 
     //Variable Characteristics
     private Integer curHP;
@@ -130,6 +130,302 @@ public class Unit implements Serializable, Comparable<Unit> {
         this.lvlSTR = lvlSTR;
 
         this.MaxLevel = maxLEVEL;
+    }
+
+    public Unit(String unitString){
+        String peeledData = unitString;
+        String data;
+        String div = ",";
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            imageName = data;
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            charName = data;
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            typeName = data;
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            DESC = data;
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                typeVal = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                ACC = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                APT = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                CMP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                CPA = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                DEF = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                EVA = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                EXP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                HP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                LEVEL = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                MOVE = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                MP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                minRANGE = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                maxRANGE = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                RET = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                STR = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curHP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curMP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curACT = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curEXP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curMOV = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                curRET = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlACC = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlDEF = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlEVA = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlEXP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlHP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlMP = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                lvlSTR = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if (peeledData.contains(div)) {
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                MaxLevel = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+        }
     }
 
     public Unit(Unit u) {
@@ -524,5 +820,46 @@ public class Unit implements Serializable, Comparable<Unit> {
     @Override
     public String toString() {
         return typeName + " --- " + charName;
+    }
+
+    public String buildString(){
+        String div = ",";
+        String unitString = "";
+        unitString += imageName + div;
+        unitString += charName + div;
+        unitString += typeName + div;
+        unitString += DESC + div;
+        unitString += typeVal + div;
+        unitString += ACC + div;
+        unitString += APT + div;
+        unitString += CMP + div;
+        unitString += CPA + div;
+        unitString += DEF + div;
+        unitString += EVA + div;
+        unitString += EXP + div;
+        unitString += HP + div;
+        unitString += LEVEL + div;
+        unitString += MOVE + div;
+        unitString += MP + div;
+        unitString += minRANGE + div;
+        unitString += maxRANGE + div;
+        unitString += RET + div;
+        unitString += STR + div;
+        unitString += curHP + div;
+        unitString += curMP + div;
+        unitString += curACT + div;
+        unitString += curEXP + div;
+        unitString += curMOV + div;
+        unitString += curRET + div;
+        unitString += lvlACC + div;
+        unitString += lvlDEF + div;
+        unitString += lvlEVA + div;
+        unitString += lvlEXP + div;
+        unitString += lvlHP + div;
+        unitString += lvlMP + div;
+        unitString += lvlSTR + div;
+        unitString += MaxLevel + div;
+
+        return unitString;
     }
 }

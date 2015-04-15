@@ -8,6 +8,7 @@ public class Terrain implements Serializable {
     private Integer evaMod;
     private Integer movMod;
     private Integer retMod;
+    private String div = "@";
 
     public Terrain(){
         this.defMod = 0;
@@ -21,6 +22,46 @@ public class Terrain implements Serializable {
         this.evaMod = evaMod;
         this.movMod = movMod;
         this.retMod = retMod;
+    }
+
+    public Terrain(String terrainString){
+        String peeledData = terrainString;
+        String data;
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                defMod = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1, peeledData.length());
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                evaMod = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1, peeledData.length());
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                movMod = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1, peeledData.length());
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0, peeledData.indexOf(div));
+            try {
+                retMod = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe);
+            }
+        }
     }
 
     public Terrain(Terrain t){
@@ -79,8 +120,17 @@ public class Terrain implements Serializable {
         return result;
     }
 
+    public String buildString(){
+        return defMod + div + evaMod + div + movMod + div + retMod + div;
+    }
+
     @Override
-    public String toString(){
-        return "def = " +  defMod + "| eva = " + evaMod + "| mov = " + movMod + "| ret = " + retMod + "\n";
+    public String toString() {
+        return "Terrain{" +
+                "defMod=" + defMod +
+                ", evaMod=" + evaMod +
+                ", movMod=" + movMod +
+                ", retMod=" + retMod +
+                '}';
     }
 }

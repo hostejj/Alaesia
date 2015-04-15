@@ -1,24 +1,22 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" build-on-make="true" name="Alaesia">
+  <artifact type="javafx" name="Alaesia">
     <output-path>$PROJECT_DIR$/out/artifacts/Alaesia</output-path>
     <properties id="javafx-properties">
       <options>
         <option name="appClass" value="GUIs.PrimaryPane" />
-        <option name="convertCss2Bin" value="true" />
-        <option name="description" value="2d Tactics Game" />
-        <option name="height" value="768" />
+        <option name="description" value="" />
         <option name="htmlParamFile" value="" />
-        <option name="nativeBundle" value="exe" />
         <option name="paramFile" value="" />
-        <option name="title" value="Alaesia" />
-        <option name="vendor" value="Johnathon" />
-        <option name="width" value="1024" />
+        <option name="title" value="" />
+        <option name="vendor" value="" />
       </options>
     </properties>
     <root id="root">
       <element id="archive" name="Alaesia.jar">
         <element id="module-output" name="Alaesia" />
+        <element id="dir-copy" path="$PROJECT_DIR$/Resources" />
       </element>
+      <element id="dir-copy" path="$PROJECT_DIR$/Resources" />
     </root>
   </artifact>
 </component>

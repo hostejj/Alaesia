@@ -28,6 +28,7 @@ public class Game implements Serializable {
     private final static Integer HITEXP = 2;
     private final static Integer KILLEXP = 5;
     private Player winner;
+    private String div = "&";
 
     public static enum GameState {
         PLACEMENTPHASE, BATTLE, UNITMOVE, GAMEOVER
@@ -41,6 +42,53 @@ public class Game implements Serializable {
         this.maxArmyValue = maxArmyValue;
         this.maxTurnPoints = maxTurnPoints;
         this.turnLimit = turnLimit;
+
+        players = new ArrayList<Player>();
+        for (int i=0;i<gameMap.getMaxPlayers(); i++){
+            players.add(new Player());
+            players.get(i).setTurnPoints(maxTurnPoints);
+            players.get(i).setMaxTurnPoints(maxTurnPoints);
+        }
+
+        this.currentPlayer = new ReadOnlyObjectWrapper<Player>(this, "currentPlayer", players.get(0));
+        this.gameState = new ReadOnlyObjectWrapper<GameState>(this, "gameState", GameState.PLACEMENTPHASE);
+    }
+
+    public Game(String gameString){
+        String peeledData = gameString;
+        String data;
+
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                maxArmyValue = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                maxTurnPoints = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            try{
+                turnLimit = Integer.parseInt(data);
+            } catch (NumberFormatException nfe){
+                System.err.println(nfe.toString());
+            }
+            peeledData = peeledData.substring(peeledData.indexOf(div)+1);
+        }
+        if(peeledData.contains(div)){
+            data = peeledData.substring(0,peeledData.indexOf(div));
+            gameMap = new GameMap(data);
+        }
 
         players = new ArrayList<Player>();
         for (int i=0;i<gameMap.getMaxPlayers(); i++){
@@ -548,5 +596,16 @@ public class Game implements Serializable {
 
     public void setLogMessage(String logMessage) {
         this.logMessage = logMessage;
+    }
+
+    public String buildString(){
+        String gameString = "";
+
+        gameString += maxArmyValue + div;
+        gameString += maxTurnPoints + div;
+        gameString += turnLimit + div;
+        gameString += gameMap.buildString() + div;
+
+        return gameString;
     }
 }

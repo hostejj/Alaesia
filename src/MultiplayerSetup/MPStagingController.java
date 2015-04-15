@@ -6,15 +6,19 @@ import GUIs.Navigator;
 import GUIs.TransferModel;
 import GameBoard.GameMap;
 import GameConcepts.Game;
+import GameConcepts.Unit;
 import Networking.ClientConnection;
 import Networking.ClientServer;
+import StagingPane.PlayerTab;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class MPStagingController implements Initializable {
@@ -28,6 +32,7 @@ public class MPStagingController implements Initializable {
     @FXML private ChatPane chatPane;
     private TransferModel transferModel = new TransferModel();
     private Game game;
+    private boolean firstPLYCHNG = false;
     public static Integer BACK = 0;
     public static Integer SEL = 1;
     public static Integer START = 2;
@@ -35,6 +40,7 @@ public class MPStagingController implements Initializable {
     public static Integer RND = 4;
     public static Integer CHAT = 5;
     public static Integer PLAYTYPE = 6;
+    public static Integer REMOVEUNIT = 7;
     private HashMap<String, ClientServer> servPlayerMap = new HashMap<String, ClientServer>(); // for host only
 
     private boolean isHost;
@@ -80,10 +86,21 @@ public class MPStagingController implements Initializable {
                             names.add(key);
                         }
                         mpPlayerPane.resetPlayerPane(totalPlayers, names);
+                        ArrayList<String> privNames = new ArrayList<String>();
+                        for (String key: servPlayerMap.keySet()){
+                            if(servPlayerMap.get(key) == null){
+                                privNames.add(key);
+                            }
+                        }
+                        mpPlayerPane.setupPrivileges(privNames);
+                        playerSelPane.setupPriviledges(true, privNames);
                     } else {
                         ErrorPopop.newPopup("You do not have the correct amount of players for that map.\nYou have: " +
                             totalPlayers + "\nNeeded: " + mpMapSelectionPane.getCurrentMapSel().getMaxPlayers());
                     }
+                    String gameString = game.buildString();
+                    TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
+                            ClientServer.COMMANDS.MAPSEL, gameString);
                 }
             }
         } else if (choice == START){
@@ -91,9 +108,79 @@ public class MPStagingController implements Initializable {
                 Navigator.loadScene(Navigator.SPGAME);
             }
         } else if (choice == ADD){
-
+            if(isHost){
+                if(mpPlayerPane != null) {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if(mpT.isSelected()){
+                            if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                                ((MPPlayerTab) mpT).addUnit(mpSelectionPane.getSelectedUnit());
+                                String addUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
+                                        ClientServer.COMMANDS.ADDUNIT, addUnitString);
+                                break; // no need to continue searching if already found
+                            }
+                        }
+                    }
+                }
+            } else {
+                if(mpPlayerPane != null) {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if(mpT.isSelected()){
+                            if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                                ((MPPlayerTab) mpT).addUnit(mpSelectionPane.getSelectedUnit());
+                                String addUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getJoinController().getClientConnection().addBufferData(
+                                        ClientConnection.COMMANDS.ADDUNIT, addUnitString);
+                                break; // no need to continue searching if already found
+                            }
+                        }
+                    }
+                }
+            }
         } else if (choice == RND){
-
+            if (isHost){
+                for (Tab mpT : mpPlayerPane.getTabs()) {
+                    if(mpT.isSelected()){
+                        if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                            ((MPPlayerTab) mpT).removeAllUnits();
+                            TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
+                                    ClientServer.COMMANDS.RMALL, ((MPPlayerTab) mpT).getText());
+                            Random random = new Random();
+                            for(int i = 0; i < ((MPPlayerTab) mpT).getMaxUnits(); i++){
+                                Integer rindex = random.nextInt(mpSelectionPane.getUnits().size());
+                                mpSelectionPane.setSelectedUnit(mpSelectionPane.getUnits().get(rindex).getUnit());
+                                mpSelectionPane.getSelectedUnit().setCharName(mpSelectionPane.chooseRandName());
+                                ((MPPlayerTab) mpT).addUnit(mpSelectionPane.getSelectedUnit());
+                                String addUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
+                                        ClientServer.COMMANDS.ADDUNIT, addUnitString);
+                            }
+                            break; // no need to continue searching if already found
+                        }
+                    }
+                }
+            } else {
+                for (Tab mpT : mpPlayerPane.getTabs()) {
+                    if(mpT.isSelected()){
+                        if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                            ((MPPlayerTab) mpT).removeAllUnits();
+                            TransferModel.getTransferModel().getJoinController().getClientConnection().addBufferData(
+                                    ClientConnection.COMMANDS.RMALL, ((MPPlayerTab) mpT).getText());
+                            Random random = new Random();
+                            for(int i = 0; i < ((MPPlayerTab) mpT).getMaxUnits(); i++){
+                                Integer rindex = random.nextInt(mpSelectionPane.getUnits().size());
+                                mpSelectionPane.setSelectedUnit(mpSelectionPane.getUnits().get(rindex).getUnit());
+                                mpSelectionPane.getSelectedUnit().setCharName(mpSelectionPane.chooseRandName());
+                                ((MPPlayerTab) mpT).addUnit(mpSelectionPane.getSelectedUnit());
+                                String addUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getJoinController().getClientConnection().addBufferData(
+                                        ClientConnection.COMMANDS.ADDUNIT, addUnitString);
+                            }
+                            break; // no need to continue searching if already found
+                        }
+                    }
+                }
+            }
         } else if (choice == CHAT) {
             String chatMessage = activeName + ": " + chatPane.getChatEntry().getText() + "\n";
             chatPane.getChatBox().appendText(chatMessage);
@@ -353,6 +440,35 @@ public class MPStagingController implements Initializable {
                         ClientServer.COMMANDS.PLAYCHNG, playerString);
                 //end is host
             }
+        } else if (choice == REMOVEUNIT){
+            if(isHost){
+                if(mpPlayerPane != null) {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if(mpT.isSelected()){
+                            if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                                String rmUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
+                                        ClientServer.COMMANDS.RMUNIT, rmUnitString);
+                                break; // no need to continue searching if already found
+                            }
+                        }
+                    }
+                }
+            } else {
+                if(mpPlayerPane != null) {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if(mpT.isSelected()){
+                            if (((MPPlayerTab) mpT).hasAddPrivilege()) {
+                                ((MPPlayerTab) mpT).addUnit(mpSelectionPane.getSelectedUnit());
+                                String addUnitString = ((MPPlayerTab) mpT).getText() + "|" + mpSelectionPane.getSelectedUnit().buildString();
+                                TransferModel.getTransferModel().getJoinController().getClientConnection().addBufferData(
+                                        ClientConnection.COMMANDS.RMUNIT, addUnitString);
+                                break; // no need to continue searching if already found
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -360,17 +476,16 @@ public class MPStagingController implements Initializable {
         activeName = transferModel.getTransferModel().getHostController().getNameField().getText();
         servPlayerMap.put(activeName, null);
         playerSelPane.getName1Label().setText(activeName);
-        playerSelPane.getCombo1().setDisable(true);
         mpMapSelectionPane.hostPrivileges();
         mpOptionsPane.hostPrivileges();
+
+        ArrayList<String> name = new ArrayList<String>();
+        name.add(activeName);
+        playerSelPane.setupPriviledges(true, name);
     }
 
     private void clientSetup(){
         activeName = transferModel.getTransferModel().getJoinController().getNameField().getText();
-        playerSelPane.getCombo1().setDisable(true);
-        playerSelPane.getCombo2().setDisable(true);
-        playerSelPane.getCombo3().setDisable(true);
-        playerSelPane.getCombo4().setDisable(true);
     }
 
     public boolean startValid(){
@@ -378,11 +493,62 @@ public class MPStagingController implements Initializable {
     }
 
     public void clientUpdate(ClientConnection.COMMANDS command, final String data){
-        if(command == ClientConnection.COMMANDS.CHAT){
+        if(command == ClientConnection.COMMANDS.ADDUNIT){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (data.contains("|")) {
+                        String playerName = data.substring(0, data.indexOf("|"));
+                        String unitData = data.substring(data.indexOf("|")+ 1);
+                        if(mpPlayerPane != null) {
+                            for (Tab mpT : mpPlayerPane.getTabs()) {
+                                if(mpT.getText().equals(playerName)){
+                                    ((MPPlayerTab) mpT).addUnit(new Unit(unitData));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else if(command == ClientConnection.COMMANDS.CHAT){
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
                     chatPane.getChatBox().appendText(data);
+                }
+            });
+        } else if(command == ClientConnection.COMMANDS.MAPSEL){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    game = new Game(data);
+                    mpMapSelectionPane.setMapData(game.getGameMap());
+                    if(!mpMapSelectionPane.mapExists(game.getGameMap())){
+                        mpMapSelectionPane.saveMap(game.getGameMap());
+                    }
+                    ArrayList<String> names = new ArrayList<String>();
+                    if(!playerSelPane.getName1Label().getText().equals("OPEN") &&
+                            !playerSelPane.getName1Label().getText().equals("CLOSED")){
+                        names.add(playerSelPane.getName1Label().getText());
+                    }
+                    if(!playerSelPane.getName2Label().getText().equals("OPEN") &&
+                            !playerSelPane.getName2Label().getText().equals("CLOSED")){
+                        names.add(playerSelPane.getName2Label().getText());
+                    }
+                    if(!playerSelPane.getName3Label().getText().equals("OPEN") &&
+                            !playerSelPane.getName3Label().getText().equals("CLOSED")){
+                        names.add(playerSelPane.getName3Label().getText());
+                    }
+                    if(!playerSelPane.getName4Label().getText().equals("OPEN") &&
+                            !playerSelPane.getName4Label().getText().equals("CLOSED")){
+                        names.add(playerSelPane.getName4Label().getText());
+                    }
+                    mpPlayerPane.resetPlayerPane(game.getPlayers().size(), names);
+                    ArrayList<String> privNames = new ArrayList<String>();
+                    privNames.add(activeName);
+                    mpPlayerPane.setupPrivileges(privNames);
+                    playerSelPane.setupPriviledges(true, privNames);
                 }
             });
         } else if(command == ClientConnection.COMMANDS.PLAYCHNG){
@@ -394,6 +560,7 @@ public class MPStagingController implements Initializable {
                     String name2;
                     String name3;
                     String name4;
+
                     if(data.indexOf(":") != -1){
                         name1 = data.substring(0, data.indexOf(":"));
                         peeledData = data.substring(data.indexOf(":") + 1);
@@ -447,13 +614,75 @@ public class MPStagingController implements Initializable {
                             }
                         }
                     }
+                    if(!firstPLYCHNG){
+                        ArrayList<String> name = new ArrayList<String>();
+                        name.add(activeName);
+                        playerSelPane.setupPriviledges(false, name);
+                        firstPLYCHNG = true;
+                    }
                 }
             });
-        }/// end of else if
+        } else if(command == ClientConnection.COMMANDS.RMALL){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if (mpT.isSelected()) {
+                            if(data.equals(mpT.getText())){
+                                ((MPPlayerTab) mpT).removeAllUnits();
+                            }
+                        }
+                    }
+                }
+            });
+        } else if(command == ClientConnection.COMMANDS.RMUNIT){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (data.contains("|")) {
+                        String playerName = data.substring(0, data.indexOf("|"));
+                        String unitData = data.substring(data.indexOf("|") + 1);
+                        for (Tab mpT : mpPlayerPane.getTabs()) {
+                            if (playerName.equals(mpT.getText())) {
+                                for (Unit u : ((MPPlayerTab) mpT).getUnitsList()) {
+                                    if (u.equals(new Unit(unitData))) {
+                                        ((MPPlayerTab) mpT).setSelectedUnit(u);
+                                        ((MPPlayerTab) mpT).removeSelectedUnit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public void serverUpdate(ClientServer.COMMANDS command, final String data, final ClientServer sender){
-        if(command == ClientServer.COMMANDS.CHAT){
+        if(command == ClientServer.COMMANDS.ADDUNIT){
+            for(ClientServer other: transferModel.getTransferModel().getHostController().getHostServer().getClientServers()){
+                if(other != sender){
+                    other.addBufferData(ClientServer.COMMANDS.ADDUNIT, data);
+                }
+            }
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (data.contains("|")) {
+                        String playerName = data.substring(0, data.indexOf("|"));
+                        String unitData = data.substring(data.indexOf("|")+ 1);
+                        if(mpPlayerPane != null) {
+                            for (Tab mpT : mpPlayerPane.getTabs()) {
+                                if(mpT.getText().equals(playerName)){
+                                    ((MPPlayerTab) mpT).addUnit(new Unit(unitData));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } if(command == ClientServer.COMMANDS.CHAT){
             for(ClientServer other: transferModel.getTransferModel().getHostController().getHostServer().getClientServers()){
                 if(other != sender){
                     other.addBufferData(ClientServer.COMMANDS.CHAT, data);
@@ -511,29 +740,60 @@ public class MPStagingController implements Initializable {
                         if (playerSelPane.getCombo2().getValue().equals("OPEN")) {
                             playerSelPane.getName2Label().setText(data);
                             playerSelPane.getCombo2().setValue("FILLED");
-                            String playerString = activeName + ":" + playerSelPane.getName2Label().getText() +
-                                    ":" + playerSelPane.getName3Label().getText()  + ":" + playerSelPane.getName4Label().getText()  + ":";
-                            TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
-                                    ClientServer.COMMANDS.PLAYCHNG, playerString);
                         } else if (playerSelPane.getCombo3().getValue().equals("OPEN")) {
                             playerSelPane.getName3Label().setText(data);
                             playerSelPane.getCombo3().setValue("FILLED");
-                            String playerString = activeName + ":" + playerSelPane.getName2Label().getText() +
-                                    ":" + playerSelPane.getName3Label().getText()  + ":" + playerSelPane.getName4Label().getText()  + ":";
-                            TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
-                                    ClientServer.COMMANDS.PLAYCHNG, playerString);
                         } else if (playerSelPane.getCombo4().getValue().equals("OPEN")) {
                             playerSelPane.getName4Label().setText(data);
                             playerSelPane.getCombo4().setValue("FILLED");
-                            String playerString = activeName + ":" + playerSelPane.getName2Label().getText() +
-                                    ":" + playerSelPane.getName3Label().getText()  + ":" + playerSelPane.getName4Label().getText()  + ":";
-                            TransferModel.getTransferModel().getHostController().getHostServer().addDataToAll(
-                                    ClientServer.COMMANDS.PLAYCHNG, playerString);
                         } else {
                             transferModel.getTransferModel().getHostController().getHostServer().killConnection(sender, "NOSLOTS");
                         }
                     } else {
                         transferModel.getTransferModel().getHostController().getHostServer().killConnection(sender, "NAME");
+                    }
+                }
+            });
+        } else if (command == ClientServer.COMMANDS.RMALL){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (Tab mpT : mpPlayerPane.getTabs()) {
+                        if (mpT.isSelected()) {
+                            if(data.equals(mpT.getText())){
+                                ((MPPlayerTab) mpT).removeAllUnits();
+                            }
+                        }
+                    }
+                    for(ClientServer other: transferModel.getTransferModel().getHostController().getHostServer().getClientServers()){
+                        if(other != sender){
+                            other.addBufferData(ClientServer.COMMANDS.RMALL, data);
+                        }
+                    }
+                }
+            });
+        } else if (command == ClientServer.COMMANDS.RMUNIT){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (data.contains("|")) {
+                        String playerName = data.substring(0, data.indexOf("|"));
+                        String unitData = data.substring(data.indexOf("|")+ 1);
+                        for (Tab mpT : mpPlayerPane.getTabs()) {
+                            if(playerName.equals(mpT.getText())){
+                                for (Unit u : ((MPPlayerTab) mpT).getUnitsList()){
+                                    if(u.equals(new Unit(unitData))){
+                                        ((MPPlayerTab) mpT).setSelectedUnit(u);
+                                        ((MPPlayerTab) mpT).removeSelectedUnit();
+                                    }
+                                }
+                            }
+                        }
+                        for(ClientServer other: transferModel.getTransferModel().getHostController().getHostServer().getClientServers()){
+                            if(other != sender){
+                                other.addBufferData(ClientServer.COMMANDS.RMALL, data);
+                            }
+                        }
                     }
                 }
             });

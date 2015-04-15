@@ -1,5 +1,6 @@
 package MultiplayerSetup;
 
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 import java.util.ArrayList;
@@ -24,6 +25,17 @@ public class MPPlayerPane extends TabPane {
 
     public void register(MPStagingController mpStagingController){
         this.observer = mpStagingController;
+    }
+
+    public void setupPrivileges(ArrayList<String> names){
+        for(String name: names){
+            for (Tab mppt: getTabs()){
+                if (((MPPlayerTab) mppt).getText().equals(name)){
+                    ((MPPlayerTab) mppt).setupPrivileges();
+                    break;
+                }
+            }
+        }
     }
 
     public MPStagingController getObserver() {
